@@ -1,5 +1,5 @@
 /**
- * @author YOUR NAME HERE
+ * @author bfhurley
  */
 package edu.iastate.cs2280.hw3;
 
