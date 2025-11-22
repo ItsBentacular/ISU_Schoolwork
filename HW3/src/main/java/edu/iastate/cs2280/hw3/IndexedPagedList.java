@@ -103,11 +103,6 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
 	  tail = new Page<E>(this.head, null);
 	  head.next = this.tail;
 	  pageIndex = new ArrayList<>();
-	  
-    // TODO
-    // Initialize head and tail dummy nodes, link them.
-    // Initialize totalSize, modificationCount.
-    // Initialize the pageIndex ArrayList.
   }
 
   /**
@@ -165,6 +160,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
 	  if(pos < 0 || pos > size()) {
 		  throw new IndexOutOfBoundsException();
 	  }
+	  //an empty list
 	  if(totalSize == 0) {
 		 Page<E> page = new Page<E>(head,tail);
 		 head.next = page;
@@ -176,6 +172,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
 		 modificationCount++;
 		 return;
 	  }
+	  //not empty, but not full
 	  PageInfo<E> info = findPageForLogicalIndex(pos);
 	  int offset = info.offset;
 	  Page<E> page = info.page;
@@ -188,6 +185,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
 		  modificationCount++;
 		  return;
 	  }
+	  // full page, move things
 	  Page<E> newPage = new Page<E>(page, page.next);
 	  page.next = newPage;
 	  newPage.next.prev = newPage;
@@ -214,8 +212,6 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
 	  }
 	  totalSize++;
 	  modificationCount++;
-	  
-    // TODO
   }
 
   /**
@@ -687,7 +683,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public boolean hasPrevious() {
     	checkComodification();
-    	if(logicalIndex < 0) {
+    	if(logicalIndex > 0) {
     		return true;
     	}
     	return false;
@@ -703,7 +699,16 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     	if(hasPrevious() == false) {
     		throw new NoSuchElementException();
     	}
-      // TODO
+    	logicalIndex --;
+    	pageOffset --;
+    	if(pageOffset < 0) {
+    		currentPage = currentPage.prev;
+    		pageOffset = currentPage.count - 1;
+    	}
+    	E item = currentPage.items[pageOffset];
+		lastItemIndex = logicalIndex;
+		lastDirection = Direction.PREVIOUS;
+		return item;
     }
 
     /**
@@ -713,7 +718,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public int nextIndex() {
     	checkComodification();
-      // TODO
+    	return logicalIndex;
     }
 
     /**
@@ -723,7 +728,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public int previousIndex() {
     	checkComodification();
-      // TODO
+    	return logicalIndex - 1;
     }
 
     /**
@@ -747,7 +752,19 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public void remove() {
     	checkComodification();
-      // TODO
+    	if(lastDirection == Direction.NONE) {
+    		throw new IllegalStateException();
+    	}
+    	IndexedPagedList.this.remove(lastItemIndex);
+    	if(lastDirection == Direction.NEXT) {
+    		logicalIndex--;
+    	}
+    	PageInfo<E> info = findPageForLogicalIndex(logicalIndex);
+    	this.currentPage = info.page;
+    	this.pageOffset = info.offset;
+    	expectedModificationCount = modificationCount;
+    	lastDirection = Direction.NONE;
+    	lastItemIndex = -1;
     }
 
     /**
@@ -771,7 +788,17 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public void set(E item) {
     	checkComodification();
-      // TODO
+    	if(lastDirection == Direction.NONE) {
+    		throw new IllegalStateException();
+    	}
+    	if(item == null) {
+    		throw new NullPointerException();
+    	}
+    	PageInfo<E> info = findPageForLogicalIndex(lastItemIndex);
+    	int offset = info.offset;
+    	Page<E> page = info.page;
+    	
+    	page.items[offset] = item;
     }
 
     /**
