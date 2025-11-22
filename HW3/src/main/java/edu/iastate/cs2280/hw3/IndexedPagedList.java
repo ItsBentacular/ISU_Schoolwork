@@ -131,11 +131,8 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
    */
   @Override
   public boolean add(E item) {
-	  if(add(totalSize , item) == 0) {
+	  add(totalSize , item);
 		 return true; 
-	  }
-	  return false;
-    // TODO - Avoid code duplication if you can
   }
 
   /**
@@ -162,6 +159,62 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
    */
   @Override
   public void add(int pos, E item) {
+	  if (item == null) {
+		  throw new NullPointerException();
+	  }
+	  if(pos < 0 || pos > size()) {
+		  throw new IndexOutOfBoundsException();
+	  }
+	  if(totalSize == 0) {
+		 Page<E> page = new Page<E>(head,tail);
+		 head.next = page;
+		 tail.prev = page;
+		 page.addItem(0, item);
+		 IndexEntry<E> entry = new IndexEntry<>(page, 0, 1);
+		 pageIndex.add(entry);
+		 totalSize++;
+		 modificationCount++;
+		 return;
+	  }
+	  PageInfo<E> info = findPageForLogicalIndex(pos);
+	  int offset = info.offset;
+	  Page<E> page = info.page;
+	  if(page.count < PAGE_CAPACITY) {
+		  page.addItem(offset, item);
+		  int indexInList = findIndexInPageIndex(page);
+		  pageIndex.get(indexInList).count++;
+		  updatePageIndex(indexInList + 1, 1);
+		  totalSize++;
+		  modificationCount++;
+		  return;
+	  }
+	  Page<E> newPage = new Page<E>(page, page.next);
+	  page.next = newPage;
+	  newPage.next.prev = newPage;
+	  for(int i = 0; i < HALF_CAPACITY; i++) {
+		 E newItem = page.removeItem(HALF_CAPACITY);
+		  newPage.addItem(i, newItem);
+	  }
+	  int indexInList = findIndexInPageIndex(page);
+	  IndexEntry<E> oldEntry = pageIndex.get(indexInList);
+	  oldEntry.count = HALF_CAPACITY;
+	  
+	  int pagePos = findIndexInPageIndex(page);
+	  IndexEntry<E> newEntry = new IndexEntry<>(newPage,(oldEntry.logicalIndex + HALF_CAPACITY),HALF_CAPACITY);
+	  pageIndex.add(indexInList + 1, newEntry);
+	  
+	  if(pos < newEntry.logicalIndex) {
+		  page.addItem(pos - oldEntry.logicalIndex, item);
+		  oldEntry.count++;
+		  updatePageIndex(indexInList + 1,1);
+	  } else {
+		  newPage.addItem(pos - newEntry.logicalIndex, item);
+		  newEntry.count++;
+		  updatePageIndex(indexInList + 2,1);
+	  }
+	  totalSize++;
+	  modificationCount++;
+	  
     // TODO
   }
 
@@ -210,7 +263,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
    */
   @Override
   public ListIterator<E> listIterator(int pos) {
-    // TODO
+	  return new PagedListIterator(pos);
   }
 
   // --- Private Helper Methods and Classes ---
@@ -566,6 +619,14 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      * @param pos The logical index to start at.
      */
     PagedListIterator(int pos) {
+    	PageInfo<E> info = findPageForLogicalIndex(pos);
+    	this.pageOffset = info.offset;
+    	this.currentPage = info.page;
+    	this.logicalIndex = pos;
+    	this.lastItemIndex = -1;
+    	this.lastDirection = Direction.NONE;
+    	this.expectedModificationCount = modificationCount;
+    	
       // TODO
     }
 
@@ -590,7 +651,11 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public boolean hasNext() {
-      // TODO
+    	checkComodification();
+    	if(logicalIndex < totalSize) {
+    		return true;
+    	}
+    	return false;
     }
 
     /**
@@ -599,7 +664,20 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public E next() {
-      // TODO
+    	checkComodification();
+    	if(hasNext() == false) {
+    		throw new NoSuchElementException();
+    	}
+    	E item = currentPage.items[pageOffset];
+    	logicalIndex++;
+    	pageOffset++;
+    	if(pageOffset == currentPage.count) {
+    		currentPage = currentPage.next;
+    		pageOffset = 0;
+    	}
+    	lastItemIndex = logicalIndex - 1;
+    	lastDirection = Direction.NEXT;
+    	return item;
     }
 
     /**
@@ -608,7 +686,11 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public boolean hasPrevious() {
-      // TODO
+    	checkComodification();
+    	if(logicalIndex < 0) {
+    		return true;
+    	}
+    	return false;
     }
 
     /**
@@ -617,6 +699,10 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public E previous() {
+    	checkComodification();
+    	if(hasPrevious() == false) {
+    		throw new NoSuchElementException();
+    	}
       // TODO
     }
 
@@ -626,6 +712,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public int nextIndex() {
+    	checkComodification();
       // TODO
     }
 
@@ -635,6 +722,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public int previousIndex() {
+    	checkComodification();
       // TODO
     }
 
@@ -658,6 +746,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public void remove() {
+    	checkComodification();
       // TODO
     }
 
@@ -681,6 +770,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public void set(E item) {
+    	checkComodification();
       // TODO
     }
 
@@ -702,6 +792,7 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
      */
     @Override
     public void add(E item) {
+    	checkComodification();
       // TODO
     }
 
