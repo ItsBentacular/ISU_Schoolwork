@@ -325,6 +325,10 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
    * @return A PageInfo object containing the page and offset.
    */
   private PageInfo<E> findPageForLogicalIndex(int pos) {
+	  //forgot this
+	  if(pageIndex.isEmpty()) {
+		  return new PageInfo<E>(tail, 0);
+	  }
 	  int foundIndex = Collections.binarySearch(pageIndex, pos, INDEX_COMPARATOR);
 	  
       if (foundIndex < 0) {
@@ -669,8 +673,6 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     	this.lastItemIndex = -1;
     	this.lastDirection = Direction.NONE;
     	this.expectedModificationCount = modificationCount;
-    	
-      // TODO
     }
 
     /**
