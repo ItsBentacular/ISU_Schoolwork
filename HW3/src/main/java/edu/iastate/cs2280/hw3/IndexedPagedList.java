@@ -240,7 +240,54 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
    */
   @Override
   public E remove(int pos) {
-    // TODO
+	  if(pos < 0 || pos >= size()) {
+		  throw new IndexOutOfBoundsException();
+	  }
+	  PageInfo<E> info = findPageForLogicalIndex(pos);
+	  E item = info.page.removeItem(info.offset);
+	  modificationCount++;
+	  totalSize--;
+	  int index = findIndexInPageIndex(info.page);
+	  pageIndex.get(index).count--;
+	  
+	  if(info.page.count < HALF_CAPACITY) {
+		  Page<E> next = info.page.next;
+		  if(next == tail) {
+			  if(info.page.count == 0) {
+				  info.page.prev.next = info.page.next;
+				  info.page.next.prev = info.page.prev;
+				  pageIndex.remove(index);
+			  }
+		  } else {
+			  //rebalance
+			 if(next.count > HALF_CAPACITY) {
+				 E movedItem = next.removeItem(0);
+				 info.page.addItem(info.page.count, movedItem);
+				 
+				 pageIndex.get(index).count++;
+				 
+				 IndexEntry<E> nextEntry = pageIndex.get(index + 1);
+				 nextEntry.count--;
+				 nextEntry.logicalIndex++;
+			 }
+			 	// merge
+			 else {
+				 int itemsMove = next.count;
+				 for(int i = 0; i < itemsMove; i++) {
+					 E movedItem = next.removeItem(0);
+					 info.page.addItem(info.page.count, movedItem);
+				 }
+				 info.page.next = next.next;
+				 next.next.prev = info.page;
+				 
+				 pageIndex.get(index).count += itemsMove;
+				 pageIndex.remove(index + 1);
+			 }
+		  }
+	  }
+	  updatePageIndex(index + 1, -1);
+	  
+	  return item;
   }
 
   /**
@@ -820,7 +867,17 @@ public class IndexedPagedList<E> extends AbstractSequentialList<E> implements Li
     @Override
     public void add(E item) {
     	checkComodification();
-      // TODO
+    	if(item == null) {
+    		throw new NullPointerException();
+    	}
+		IndexedPagedList.this.add(logicalIndex, item);
+		logicalIndex++;
+		expectedModificationCount++;
+		PageInfo<E> info = findPageForLogicalIndex(logicalIndex);
+		this.currentPage = info.page;
+		this.pageOffset = info.offset;
+		lastDirection = Direction.NONE;
+		lastItemIndex = -1;
     }
 
     /**

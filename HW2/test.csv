@@ -1,0 +1,5 @@
+algorithm,size,time (ns)
+SelectionSort,1000,11622018
+InsertionSort,1000,5168402
+MergeSort,1000,627618
+QuickSort,1000,883966
