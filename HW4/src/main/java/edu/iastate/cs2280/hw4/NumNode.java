@@ -4,12 +4,12 @@
 package edu.iastate.cs2280.hw4;
 
 /**
- * Node for the variable in the tree, no child nodes.
+ * Node for a variable in the tree, no child nodes, extends LogicNode.
  */
 public class NumNode extends LogicNode {
 	
 	/**
-	 * variable for holding the state of the node (0 or 1), uses boolean 0 and 1 vs integer 0 and 1.
+	 * variable for holding the state of the node (0 or 1), uses boolean 0 and 1 rather than an integer 0 and 1.
 	 */
 	private boolean state;
 	/**
@@ -33,13 +33,25 @@ public class NumNode extends LogicNode {
 	public boolean evaluate() {
 		return state;
 	}
-	
+	/**
+	 * method that updates the state of the node to either 0 or 1 (boolean).
+	 * @param newState The new state that state is getting updated to.
+	 */
 	public void updateState(boolean newState) {
 		this.state = newState;
 	}
-	
+	/**
+	 * gets the state's name.
+	 * @return returns the state's name.
+	 */
 	public String getName() {
 		return stateName;
+	}
+	
+	@Override
+	public String toString() {
+		return stateName;
+		
 	}
 
 }

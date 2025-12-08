@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"edu.iastate.cs2280.hw4","c":"OrNode","l":"evaluate()"},{"p":"edu.iastate.cs2280.hw4","c":"OrNode","l":"OrNode()","u":"%3Cinit%3E()"}];updateSearchResults();

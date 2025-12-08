@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"edu.iastate.cs2280.hw4","l":"OrNode"}];updateSearchResults();
