@@ -1,0 +1,4 @@
+& Input_One | Input_Two Input_Three
+ Input_One=1 Input_Two=0 Input_Three=1
+ Input_One=1 Input_Two=0 Input_Three=0
+ Input_One=0 Input_Two=1 Input_Three=1
