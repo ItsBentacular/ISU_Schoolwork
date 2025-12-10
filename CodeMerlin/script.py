@@ -1,72 +1,120 @@
-import os
-import openai
-
+import customtkinter as ctk
+from tkinter import filedialog
 from openai import OpenAI
-client = OpenAI(base_url = "http://localhost:1234/v1", api_key="lm-studio")
+import threading
+import os
 
-codeSnippet = """public void add(int pos, E item) {
-	  if (item == null) {
-		  throw new NullPointerException();
-	  }
-	  if(pos < 0 || pos > size()) {
-		  throw new IndexOutOfBoundsException();
-	  }
-	  if(totalSize == 0) {
-		 Page<E> page = new Page<E>(head,tail);
-		 head.next = page;
-		 tail.prev = page;
-		 page.addItem(0, item);
-		 IndexEntry<E> entry = new IndexEntry<>(page, 0, 1);
-		 pageIndex.add(entry);
-		 totalSize++;
-		 modificationCount++;
-		 return;
-	  }
-	  PageInfo<E> info = findPageForLogicalIndex(pos);
-	  int offset = info.offset;
-	  Page<E> page = info.page;
-	  if(page.count < PAGE_CAPACITY) {
-		  page.addItem(offset, item);
-		  int indexInList = findIndexInPageIndex(page);
-		  pageIndex.get(indexInList).count++;
-		  updatePageIndex(indexInList + 1, 1);
-		  totalSize++;
-		  modificationCount++;
-		  return;
-	  }
-	  Page<E> newPage = new Page<E>(page, page.next);
-	  page.next = newPage;
-	  newPage.next.prev = newPage;
-	  for(int i = 0; i < HALF_CAPACITY; i++) {
-		 E newItem = page.removeItem(HALF_CAPACITY);
-		  newPage.addItem(i, newItem);
-	  }
-	  int indexInList = findIndexInPageIndex(page);
-	  IndexEntry<E> oldEntry = pageIndex.get(indexInList);
-	  oldEntry.count = HALF_CAPACITY;
-	  
-	  int pagePos = findIndexInPageIndex(page);
-	  IndexEntry<E> newEntry = new IndexEntry<>(newPage,(oldEntry.logicalIndex + HALF_CAPACITY),HALF_CAPACITY);
-	  pageIndex.add(indexInList + 1, newEntry);
-	  
-	  if(pos < newEntry.logicalIndex) {
-		  page.addItem(pos - oldEntry.logicalIndex, item);
-		  oldEntry.count++;
-		  updatePageIndex(indexInList + 1,1);
-	  } else {
-		  newPage.addItem(pos - newEntry.logicalIndex, item);
-		  newEntry.count++;
-		  updatePageIndex(indexInList + 2,1);
-	  }
-	  totalSize++;
-	  modificationCount++;"""
+ctk.set_appearance_mode("Light")
+ctk.set_default_color_theme("blue")
 
 
-completion = client.chat.completions.create(
-    model = "fireball-meta-llama-3.2-8b-instruct-agent-003-128k-code-dpo",
-    messages =[
-        {"role": "system", "content": "you are a friendly assistant named Merlin who helps review code and find any bugs and problems with optimization. you will ALWAYS look for easy errors first, and unoptimized code (UNOPTIMIZED MEANS LITERALLY SLOW AS IN O of N Notation). you will respond by starting with a summary of the code, then you will repeat their code back to them with highlights and comments on the code that can be fixed. it is **FINE** to say the code is good enough or doesn't have any problems, you don't have to be a perfecitonist. MAKE SURE TO FORMAT THE CODE CORRECTLY"},
-        {"role": "user", "content": codeSnippet}
-    ]
-)
-print(completion.choices[0].message.content)
+class CodeMerlinApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+        self.title("CodeMerlin")
+        self.geometry("1000x600")
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=0)
+
+        title_font = ctk.CTkFont(family="courier 10 pitch", size=50, weight="bold")
+        header_font = ctk.CTkFont(family="Roboto", size=20, weight="normal")
+
+        self.title_label = ctk.CTkLabel(self, text="Code Merlin", font=title_font)
+        self.title_label.grid(row=0, column=0, columnspan=2, pady=(10, 0))
+
+        self.input_label = ctk.CTkLabel(self, text="Input Code", font=header_font)
+        self.input_label.grid(row=1, column=0, sticky="sw", padx=20, pady=(10, 0))
+
+        self.input_text = ctk.CTkTextbox(self, width=400, corner_radius=0, border_width=3)
+        self.input_text.grid(row=2, column=0, sticky="nsew", padx=20, pady=(5, 20))
+        self.input_text.insert("0.0", "// Paste your code here...")
+
+        self.output_label = ctk.CTkLabel(self, text="Merlin's Wisdom", font=header_font)
+        self.output_label.grid(row=1, column=1, sticky="sw", padx=20, pady=(10, 0))
+
+        self.output_text = ctk.CTkTextbox(self, width=400, corner_radius=0, border_width=3)
+        self.output_text.grid(row=2, column=1, sticky="nsew", padx=20, pady=(5, 20))
+        self.output_text.configure(state="disabled")
+
+        self.load_button = ctk.CTkButton(self, text = "Load Code", command= self.load_file, width = 100, height = 24, corner_radius = 2, hover_color = "blue")
+        self.load_button.grid(row = 1, column = 0, sticky="se", padx = 20, pady = (10,5))
+
+        self.magic_button = ctk.CTkButton(
+            self,
+            text="Let Merlin work!",
+            command=self.start_magic_thread,
+            fg_color="green",
+            hover_color="darkgreen",
+            height=50,
+            font=("Arial", 18, "bold"),
+            corner_radius=3,
+            border_width=0,
+        )
+        self.magic_button.grid(row=3, column=0, columnspan=2, pady=20)
+
+        self.client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+
+    def load_file(self):
+        try:
+            file_path = filedialog.askopenfilename(title = "Select File", filetypes = (("Java Files", "*.java"), ("Python Files", "*.py"), ("C Files", "*.h"), ("All Files", "*.*")))
+            if file_path:
+                with open(file_path, "r") as f:
+                    content = f.read()
+                self.input_text.delete("0.0", "end")
+                self.input_text.insert("0.0",content)
+
+        except Exception as e:
+            print(f"ERROR: file was unable to be opened: {e}")
+
+
+    def start_magic_thread(self):
+        self.magic_button.configure(state="disabled", text="Merlin is working...")
+        self.output_text.configure(state="normal")
+        self.output_text.delete("0.0", "end")
+
+        threading.Thread(target=self.perform_magic, daemon=True).start()
+
+    def perform_magic(self):
+        aiInstructions = (
+            "you are a friendly assistant named Merlin who helps review code and find any bugs and problems with optimization. "
+            "you will ALWAYS look for easy errors first, and unoptimized code (UNOPTIMIZED MEANS LITERALLY SLOW AS IN O of N Notation). "
+            "you will respond by starting with a summary of the code, then you will repeat their code back to them with highlights and comments on the code that can be fixed. "
+            "it is **FINE** to say the code is good enough or doesn't have any problems, you don't have to be a perfectionist. MAKE SURE TO FORMAT THE CODE CORRECTLY")
+        try:
+            code_snippet = self.input_text.get("0.0", "end")
+
+            completion = self.client.chat.completions.create(
+                model="fireball-meta-llama-3.2-8b-instruct-agent-003-128k-code-dpo",
+                messages=[
+                    {"role": "system",
+                     "content": aiInstructions},
+                    {"role": "user", "content": code_snippet}
+                ],
+                temperature=0.7,
+                stream=True,
+            )
+
+            for chunk in completion:
+                if chunk.choices[0].delta.content:
+                    content = chunk.choices[0].delta.content
+
+                    self.output_text.insert("end", content)
+                    self.output_text.see("end")
+
+        except Exception as e:
+            self.output_text.insert("end", f"\nError: {str(e)}")
+        finally:
+            self.output_text.configure(state="disabled")
+            self.magic_button.configure(state="normal", text = "Let Merlin work!")
+
+
+if __name__ == "__main__":
+    app = CodeMerlinApp()
+    app.mainloop()
