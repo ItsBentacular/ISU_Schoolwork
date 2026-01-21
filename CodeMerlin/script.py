@@ -63,7 +63,9 @@ class CodeMerlinApp(ctk.CTk):
 
     def load_file(self):
         try:
-            file_path = filedialog.askopenfilename(title = "Select File", filetypes = (("Java Files", "*.java"), ("Python Files", "*.py"), ("C Files", "*.h"), ("All Files", "*.*")))
+            file_path = filedialog.askopenfilename(title = "Select File", filetypes = (("Java Files", "*.java"), ("Python Files", "*.py"), ("C Files", "*.h"),
+                                                                                       ("Lua Files", "*.lua"), ("HTML Files", "*.html"), ("JavaScript Files", "*.js"),
+                                                                                       ("C++ Files", "*.cpp"),("All Files", "*.*")))
             if file_path:
                 with open(file_path, "r") as f:
                     content = f.read()
@@ -82,11 +84,11 @@ class CodeMerlinApp(ctk.CTk):
         threading.Thread(target=self.perform_magic, daemon=True).start()
 
     def perform_magic(self):
-        aiInstructions = (
-            "you are a friendly assistant named Merlin who helps review code and find any bugs and problems with optimization. "
-            "you will ALWAYS look for easy errors first, and unoptimized code (UNOPTIMIZED MEANS LITERALLY SLOW AS IN O of N Notation). "
-            "you will respond by starting with a summary of the code, then you will repeat their code back to them with highlights and comments on the code that can be fixed. "
-            "it is **FINE** to say the code is good enough or doesn't have any problems, you don't have to be a perfectionist. MAKE SURE TO FORMAT THE CODE CORRECTLY")
+        aiInstructions = ("You are Merlin, a friendly and helpful software engineering assistant. "
+                          "Your goal is to review code for bugs, large flaws, and performance issues. Your priorities are to look for large flaws first, then syntax errors/logical bugs/typos, and finally performance issues in code that makes it theoretically slow (poor Big O complexity). "
+                          "You will respond in the following format: Summary: a brief explanation of what the code does, then the review, in which you will quote the code in which the error exists, and provide the fix; "
+                          "if performance issues exsist, explain the Big-O complexity and how to improve it. Finally, provide full code snippets for whatever you fixed in proper markdown. "
+                          "IF the code is bug-free and efficient, simply say so, do NOT invent problems.")
         try:
             code_snippet = self.input_text.get("0.0", "end")
 

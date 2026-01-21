@@ -1,0 +1,25 @@
+For entering distrobox: distrobox enter opengl-dev
+
+PLANS:
+Make a 3d model viewer using OpenGL
+ - wireframe with vertex points and lines as a start, with rotates and transforms
+ - Shaders need to be able to be used (at some point).
+ - needs a UI
+ -needs to be able to import and export files (.ben)?
+ - ray tracing?
+
+ for compilation: g++ src/main.cpp src/glad.c -I ./include -lglfw -lGL -ldl -o my_opengl_app -- if not in src
+ if in src: g++ main.cpp glad.c -I ../include -lglfw -lGL -ldl -o ../my_opengl_app
+
+ Using VS Code for project, with Docker dev container manager, fedora distrobox named opengl-dev
+ 
+ 1-20-26, 11:14 PM: Just started project, figured out the system heirarchy and connected everything properly, have a window object manager, now need to work on the GLAD initializer, the BL3M (Bens Linux 3d Model (viewer) )
+
+ 1-21-26, 9:41 AM, for some reason learnopengl.com won't let me on, so i'm gonna learn some basic ray tracer info and see how that works out.
+
+ for the raytrace cpp file, use the command: g++ src/raytrace/raytrace.cpp -o raytrace_test  -- for compilation
+
+ use ./name_of_file > image.ppm, to make a ppm image file.
+
+ 1-21-26, 10:50 AM, dude why the hell is C++ so goofy, like after a bit of explaining from ol' gemini I understand the rules of C++ but its dumb, too many << and {}, like big bro Java and C are right there. Idk I do like the idea tho of 
+ the C language with Java OOP, ig we'll see. Oh also made some progress on the ray tracer, started making the vector h file so that we can have 3 dimensional vectors.
