@@ -23,3 +23,22 @@ Make a 3d model viewer using OpenGL
 
  1-21-26, 10:50 AM, dude why the hell is C++ so goofy, like after a bit of explaining from ol' gemini I understand the rules of C++ but its dumb, too many << and {}, like big bro Java and C are right there. Idk I do like the idea tho of 
  the C language with Java OOP, ig we'll see. Oh also made some progress on the ray tracer, started making the vector h file so that we can have 3 dimensional vectors.
+
+1-26-26, 4:55 PM, its been a little while, just started a little bit of coding again while waiting for work, C++ is making sense more and more, and I have gemini explain keywords and other stuff so I understand syntax better.
+got the vector file done, I usually get to vectors and get confused after tris when I learn about graphics programming in the past, so hopefully I do better this time. Overall if I can eventually understand the ray tracer I will be at peace.
+
+dot product: takes two vectors and returns a scalar:
+if result is > 0, they point the same way.
+if result is = 0, they are perpendicular at 90 degrees.
+if result is < 0, they point away from each other.
+this is used to calculate how much light hits a surface, if the light vector anc surface vector point in
+opposite directions the surface is lit up.
+it can also check if a ray is hitting the front or back of an object.
+
+Cross product: takes two vectors and returns another vector:
+the new vector is perpendicular (90 degrees) to both of the vectors, used to calculate surface normals,
+which is the way a triangle is facing in a 3d space, allowing to show which way a surface is facing.
+
+1-26-26, 5:37 PM, done with the ppm generator, idk why but it's so cool to me, making graphics is just cool, and I hope to learn how to make graphics from scratch on my own (no tutorial someday).
+its just crazy to me that all images are within computers are just numbers, ppm files are easier to understand that because you can LITERALLY open up the file and see the long line of numbers that
+creates an image. well hopefully after I keep following this tutorial I learn some cool information about graphics programming that I can THEN apply to my OpenGL project.
