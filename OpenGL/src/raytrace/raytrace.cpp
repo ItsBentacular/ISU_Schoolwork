@@ -1,4 +1,5 @@
 #include <iostream>
+#include "vec3.h"
 
 int main()
 {
@@ -6,6 +7,10 @@ int main()
 
     int image_width = 256;
     int image_height = 256;
+    vec3 point1(1.0,1.0,1.0);
+    vec3 point2(3.0,1.0,1.0);
+    vec3 point3(2.0,3.0,1.0);
+
 
     //Render
 
