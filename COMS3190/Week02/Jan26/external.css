@@ -1,0 +1,17 @@
+h1 {
+    color: red;
+    background-color: bisque;
+}
+
+.size30 { font-size: 30px}
+
+.size40 { font-size: 40px}
+
+.size50 { font-size: 50px}
+
+.size60 { font-size: 60px}
+
+body {
+    background-color: antiquewhite;
+}
+        
