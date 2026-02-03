@@ -53,6 +53,9 @@ class vec3 {
 
 using point3 = vec3;
 
+// inline operators are basically a #define use but for functions, ONLY USE IF THEY ARE SMALL FUNCTIONS
+// the & keyword is for reffering to an original variable, otherwise it defaults to refering to a copy of a variable
+//std::ostream is a keyword for writing somewhere anywhere in the computer.
 inline std::ostream& operator<<(std::ostream&out, const vec3& v) {
     return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
 }

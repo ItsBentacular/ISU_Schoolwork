@@ -11,12 +11,15 @@ int main()
 
     //Render
 
+    // default info for a ppm image
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     for(int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
         for(int i = 0; i < image_width; i++) {
+            // the actual image colors
             auto pixel_color = color(double(i) / (image_width - 1), double(j) / (image_height - 1), double(100) / (image_height - 1));
+            //prints the image to terminal (sorta?)
             write_color(std::cout, pixel_color);
         }
     }

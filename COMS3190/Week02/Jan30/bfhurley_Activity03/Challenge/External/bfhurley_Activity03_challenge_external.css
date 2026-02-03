@@ -1,0 +1,23 @@
+div {
+    background-color: lightgray;
+    padding: 10px;
+}
+
+h1{
+    font-style: italic;
+    font-size: 32px;
+    color: orange;
+    text-align: left;
+}
+
+h2{
+    font-size: 24px;
+    color:darkblue;
+    text-align: left;
+}
+
+p{
+    font-size: 16px;
+    color: darkgray;
+    text-align: left;
+}

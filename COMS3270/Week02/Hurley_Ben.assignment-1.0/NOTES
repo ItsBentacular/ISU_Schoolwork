@@ -1,0 +1,23 @@
+// terminal 80 wide, 21 tall.
+
+// need terrain in terminal area.
+
+//place terrain first, then paths.
+
+//draw grass across terminal first.
+
+// choose x value, then y value. then from that find a dx and dy, draw terrain in that dx by dy square/rectangle.
+
+//for each terrain type, it is fine to overlap, and is actually encouraged as it creates more unique terrain.
+
+//for paths, draw path blocks on each side of the terminal, choose an x position for both directions (east and west), draw a path from both starting points
+//to the chosen x value, then draw a y line between the two roads.
+
+//do the same for north and south, but swap x and y, paths will naturally connect.
+
+//::: more complicated way :::
+
+//place seeds in areas around terminal (seeds are associated with different terrain types).
+// a random seed position goes into a queue, neighoring seeds are given similar terrain types and then another random seed is found, repeat until area is filled.
+// no overwriting, terrain is NULL until terrain type is put onto it, then cannot be changed, creates better terrain.
+// prof said something about dijkstras algorithm but I will probably just use the normal path system.  

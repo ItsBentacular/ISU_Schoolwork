@@ -39,6 +39,10 @@ Cross product: takes two vectors and returns another vector:
 the new vector is perpendicular (90 degrees) to both of the vectors, used to calculate surface normals,
 which is the way a triangle is facing in a 3d space, allowing to show which way a surface is facing.
 
+inline operators are basically a #define use but for functions, ONLY USE IF THEY ARE SMALL FUNCTIONS
+the & keyword is for reffering to an original variable, otherwise it defaults to refering to a copy of a variable
+std::ostream is a keyword for writing somewhere anywhere in the computer.
+
 1-26-26, 5:37 PM, done with the ppm generator, idk why but it's so cool to me, making graphics is just cool, and I hope to learn how to make graphics from scratch on my own (no tutorial someday).
 its just crazy to me that all images are within computers are just numbers, ppm files are easier to understand that because you can LITERALLY open up the file and see the long line of numbers that
 creates an image. well hopefully after I keep following this tutorial I learn some cool information about graphics programming that I can THEN apply to my OpenGL project.
