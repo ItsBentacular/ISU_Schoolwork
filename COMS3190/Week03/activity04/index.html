@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="./style.css">
+    <style>
+
+        .container{
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .project {
+            margin-bottom: 20px;
+            border: 1px solid #000000;
+            padding: 20px;
+        }
+
+    </style>
 </head>
     <body>
 
@@ -19,15 +33,33 @@
         </header>
 
         <section id="about">
+            <img src="./profile.jpg" alt="Profile Photo" style="width:600px; height:600px;">
+            <h1>Ben Hurley, SE Student at ISU </h1>
+            <p style="font-family:'Courier New', Courier, monospace; color: brown"> Hi, my name is Ben Hurley, and this is my website! </p>
+            <p> during my time as a student at ISU (in COMS3190), I have been learning the art of web design, OOP in Java, C, and C++, as well as some discreet math and algorithms. This specific website is a show of my web design abilites. </p>
         </section>
 
         <section id="projects">
+            <div class="container">
+                <h2>Projects</h2>
+                    <div class="project">
+                        <img src="./project1.jpg" alt="Project 1">
+                        <h3> Project 1 </h3>
+                        <p> This project focuses on designing a Web page using HTML and CSS. in terms of the layout, a navigation bar is created at the top
+                            displaying a list of items in a menu. It includes some text describing different sections of the page. It also includes 2 images to
+                            increase visual appeal.</p>
+                    </div>
+            </div>
         </section>
 
         <section id="contact">
+            <div class="container">
+                <h2>Contact Me</h2>
+                <p> You can reach me at bfhurley@iastate.edu </p>
         </section>
 
         <footer>
+            <p> &copy; Ben Hurley (2026) </p>
         </footer>
 
     </body>
