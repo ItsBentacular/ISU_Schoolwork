@@ -1,29 +1,40 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-struct queue_item {
+typedef enum terrain {
+    TERRAIN_ROCK = '%',
+    TERRAIN_WATER = '~',
+    TERRAIN_GRASS = ':',
+    TERRAIN_CLEAR = '.',
+    TERRAIN_TREES = '^',
+    TERRAIN_ROAD = '#',
+    TERRAIN_EMPTY = ' '
+} terrain;
+
+typedef struct queue_item {
     int x;
     int y;
+    enum terrain t_type;
     struct queue_item *next;
 
-};
+} queue_item;
 
-struct queue {
+typedef struct queue {
     struct queue_item *front;
     struct queue_item *back;
-};
+} queue;
 
-int queue_init(struct queue *q);
+int queue_init(queue *q);
 
-int queue_enqueue(struct queue *q, int x, int y);
+int queue_enqueue(queue *q, int x, int y, terrain t_type);
 
-int queue_dequeue(struct queue *q, int *x, int *y);
+int queue_dequeue(queue *q, int *x, int *y, terrain *t_type);
 
-int queue_getFront(struct queue *q);
+int queue_getFront(queue *q, int *x, int *y, terrain *t_type);
 
-int queue_getRear(struct queue *q);
+int queue_getRear(queue *q, int *x, int *y, terrain *t_type);
 
-int queue_getSize(struct queue *q);
+int queue_getSize(queue *q);
 
 
 #endif
