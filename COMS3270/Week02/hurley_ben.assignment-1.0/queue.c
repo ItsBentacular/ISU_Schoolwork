@@ -57,7 +57,7 @@ int queue_dequeue(queue *q, int *x, int *y,terrain *t_type){
 
     return 0;
 }
-// never used this
+// never used this, but I put effort into it so I don't want to delete it (yet)
 int queue_getFront(queue *q, int *x, int *y,terrain *t_type){
     if(q->front == NULL) {
         return -1;
@@ -69,7 +69,7 @@ int queue_getFront(queue *q, int *x, int *y,terrain *t_type){
 
     return 0;
 }
-// never used this either
+// never used this either, same for this, dont wanna delete my work.
 int queue_getRear(queue *q, int *x, int *y, terrain *t_type){
     if(q->back == NULL) {
         return -1;

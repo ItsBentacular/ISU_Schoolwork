@@ -1,0 +1,4 @@
+Assignment1.01, I am using a queue implementation with seeding to generate terrain as professor shaeffer mentioned during class, I have 7 seeds that generate on random spots on the map and grow using the queue, and 
+the buildings always generate on opposite sides of the road. Buildings are SUPPOSED to generate on mountains or water, because I thought it was cool. Same goes for roads, I thought it was cool to have roads going through/over 
+mountains and water. my queue implementation does have some unused functions, but I kept them just in case I need them later. While my main file has no functions, I plan to make the code easier to read and have more functions
+in future assignments.
