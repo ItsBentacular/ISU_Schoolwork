@@ -33,7 +33,14 @@ int queue_enqueue(struct queue *q, int x, int y){
 int queue_dequeue(struct queue *q, int *x, int *y){
     struct queue_item *temp;
 
-    
+    if(q->front = NULL) {
+        return -1;
+    }
+
+    *x = q->front->x;
+    *y = q->front->y;
+
+    q->front = temp;
 
     free(temp);
 }
