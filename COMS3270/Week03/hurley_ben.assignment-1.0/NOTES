@@ -1,0 +1,16 @@
+use a data struct of the map to have locations of gates and other params
+struct map {
+    gate g[4];
+}
+
+make another data struct to have a world map that holds smaller maps.
+- struct world {
+    struct *map[][]
+        initialize all to null, instaintiate when you go to location.
+}
+
+start game in middle of world, ae: if size of map is 400,400, start at 200,200 BUT make sure that in game to the user, 200,200 is actually 0,0.
+
+research into binary and fibbonaci heaps.
+
+research dijkstras algo.
