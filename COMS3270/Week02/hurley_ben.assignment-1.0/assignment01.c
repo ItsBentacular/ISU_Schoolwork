@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
     // prints final map of terrain.
     for(int i = 0; i < ROW; i++) {
         for(int j = 0; j < COLUMN; j++) {
-            printf("\033[31m %c", map[i][j]);
+            printf("%c", map[i][j]);
         }
         printf("\n");
     }

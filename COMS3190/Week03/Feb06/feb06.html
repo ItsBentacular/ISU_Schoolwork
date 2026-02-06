@@ -1,0 +1,33 @@
+<!--Javascript is NOT OOP, it is Object Based Programming, it is NOT the same as Java
+Supports: Math objects, window objects, document objects, etc.
+Similarities between Java and JS
+Same kind of operators
+similar control structures: loops, definitions, etc
+both are languages used on the internet
+labeled break/continue are same
+Objects and methods are very similar
+Differences between Java and JS
+java is OOP, JS is OBP
+Java needs a compiler for bytecode, JS does not have a compiler, but an interpreter
+JS does NOT have encapsulation, polymorphism, or any other advanced benefits.
+Java is static binding, JS is dynamic binding
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>JavaScript Test</title>
+    <script language="javascript">
+        function showAlert() {
+            var userName = window.prompt("Please enter your name:", "");
+            window.alert("Hello, " + userName + " I see you.");
+        }
+        document.writeln("<p style='color: blue;'>Hello, World!</p>");
+
+    </script>
+</head>
+    <body onload="showAlert()">
+        <p>Thank you for visiting my website!</p>
+    </body>
+</html>
