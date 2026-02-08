@@ -14,3 +14,51 @@ start game in middle of world, ae: if size of map is 400,400, start at 200,200 B
 research into binary and fibbonaci heaps.
 
 research dijkstras algo.
+
+1. Track Your Position
+You currently have a world struct that holds pointers to maps, but you don't have a way to track where the player is.
+
+Define two integer variables (e.g., current_x and current_y) in your main function.
+Initialize them to the center of the array (200, 200).
+These will serve as your internal coordinates. When you display coordinates to the user, you will calculate them relative to this center (e.g., display_x = current_x - 200).
+2. The "Lazy Loading" Loop
+Your main loop needs to change from just reading input to a "Check -> Generate -> Display" cycle.
+
+Check: When the loop starts (or after movement), look at the world array at [current_y][current_x].
+If it is NULL: This map hasn't been visited yet. You need to malloc a new map struct and assign it to that pointer. Then, call your generation functions to fill it with data.
+If it is NOT NULL: The map already exists. Do not generate it again. Just print the map pointed to by that slot.
+3. Refactoring generate_roads (The Gate Logic)
+This is the most complex part of this assignment. Currently, your generate_roads function picks random locations for all four gates. This needs to change.
+
+Pass Arguments: Change the function signature to accept four integers representing the required gate locations for North, South, East, and West.
+Sentinel Values: Decide on a value (like -1) that means "I don't care, pick a random one."
+Neighbor Checking: Before calling generate_roads for a new map at (x, y), look at the neighbors in the world array:
+North Neighbor (y - 1): If it exists (is not NULL), look at its South gate. Pass that value as the North gate requirement for your new map.
+South Neighbor (y + 1): If it exists, its North gate dictates your new South gate.
+East/West: Same logic.
+No Neighbor: If the neighbor is NULL, pass your sentinel value (-1) so the generator picks a random gate.
+World Borders: If current_y is 0 (top edge of the world), you must force the North gate to be "closed" (you might need a specific value or flag for this).
+4. Refactoring generate_builds (The Probability Logic)
+Currently, your building generator places buildings randomly or based on hardcoded logic.
+
+Manhattan Distance: In main, calculate the distance from the center: abs(current_x - 200) + abs(current_y - 200).
+Pass Distance: Update generate_builds to accept this distance as a parameter.
+Apply Formula: Inside the function, use the formula provided in the PDF to calculate the percentage chance (0-100%) of a building spawning.
+Dice Roll: Generate a random number (0-100). If it's lower than the calculated chance, place the building. If not, skip it.
+Safety: Ensure the center map (distance 0) always spawns both buildings.
+5. Handling Input
+Update your input parsing to handle the new commands:
+
+n, s, e, w: Update current_y or current_x accordingly. Check if the new coordinate is within bounds (0-400). If it is, the loop repeats and handles the "Check -> Generate -> Display" logic for the new coordinate.
+f x y: Read two integers. Convert them from relative coordinates (e.g., -5, 5) to internal coordinates (195, 205). Update your current position variables.
+q: Break the loop.
+Summary of Workflow
+User enters 'n'.
+Decrement current_y.
+Check world.m[current_y][current_x].
+It's NULL? Allocate memory.
+Check world.m[current_y + 1][current_x] (the map we just came from). It exists!
+Read its North gate.
+Call generate_roads, forcing the South gate to match, and randomizing the others.
+Call generate_builds with the new distance.
+Print the map.
