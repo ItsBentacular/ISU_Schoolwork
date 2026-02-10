@@ -68,12 +68,37 @@ int generate_start(terrain border, map *m, terrain seeds[7], queue *q){
     return 0;
 }
 
-int generate_roads(map *m) {
-        // finds a random point NOT in the corners for the gates, then draws lines out of # to a certain x or y coord, then draws another line between the ends of the two lines
-    int n_gate = rand() % (COLUMN -2) + 1;
-    int s_gate = rand() % (COLUMN -2) + 1;
-    int e_gate = rand() % (ROW - 2) + 1;
-    int w_gate = rand() % (ROW - 2) + 1;
+int generate_roads(map *m, world w, gate g[4]) {
+    // finds a random point NOT in the corners for the gates, then draws lines out of # to a certain x or y coord, then draws another line between the ends of the two lines
+    // addendum: now also checks if we are in world bounds, then if there is already a map generated in a spot, make the opposite road connect to the new maps road,
+    // ex: north connects to new maps south, west connects to east, else generate random roads.
+    int n_gate,s_gate,e_gate,w_gate;
+    // gate g[4] goes in order of north, south, east, west
+
+    //north map
+    if(w.current_y < 400 && w.m[w.current_x][w.current_y + 1] != NULL) {
+        n_gate = w.m[w.current_x][w.current_y + 1]->g[1].gate_pos;
+    } else {
+        n_gate = rand() % (COLUMN -2) + 1;
+    }
+    //south map
+    if(w.current_y > 0 && w.m[w.current_x][w.current_y - 1] != NULL) {
+        s_gate = w.m[w.current_x][w.current_y - 1]->g[0].gate_pos;
+    } else {
+        s_gate = rand() % (COLUMN -2) + 1;
+    }
+    //east map
+    if(w.current_x < 400 && w.m[w.current_x + 1][w.current_y] != NULL) {
+        e_gate = w.m[w.current_x + 1][w.current_y]->g[3].gate_pos;
+    } else {
+        e_gate = rand() % (ROW - 2) + 1;
+    }
+    //west map
+    if(w.current_x > 0 && w.m[w.current_x - 1][w.current_y] != NULL) {
+        w_gate = w.m[w.current_x - 1][w.current_y]->g[2].gate_pos;
+    } else {
+        w_gate = rand() % (ROW - 2) + 1;
+    }
 
     m->t[0][n_gate].type = TERRAIN_ROAD;
     m->t[ROW - 1][s_gate].type = TERRAIN_ROAD;
@@ -125,46 +150,63 @@ int generate_roads(map *m) {
         m->t[road_y][i].type = TERRAIN_ROAD;
     }
 
+    g[0].gate_pos = n_gate;
+    g[1].gate_pos = s_gate;
+    g[2].gate_pos = e_gate;
+    g[3].gate_pos = w_gate;
+
     return 0;
 }
 
-int generate_builds(map *m) {
+int generate_builds(map *m, int man_dis) {
+    int chance;
+    if (man_dis == 0) {
+        chance = 100;
+    } else {
+        chance = 85 - ((3 * man_dis) / 8);
+        if (chance < 10) chance = 10;
+    }
+
     // generates the pokecenters (C) in a open area on the map that is attached to a road.
     int space_x, space_y;
     int building_placed = 0;
-    while(building_placed == 0) {
-    space_x = rand() % COLUMN + 1;
-    space_y = rand() % ROW + 1;
+    if((rand() % 100) < chance) {
+        while(building_placed == 0) {
+        space_x = rand() % (COLUMN - 2) + 1;
+        space_y = rand() % (ROW - 2) + 1;
 
-    if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
-            if (m->t[space_y-1][space_x].type != TERRAIN_ROAD && m->t[space_y-2][space_x].type != TERRAIN_ROAD && m->t[space_y-1][space_x+1].type != TERRAIN_ROAD && m->t[space_y-2][space_x+1].type != TERRAIN_ROAD) {
+        if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
+                if (m->t[space_y-1][space_x].type != TERRAIN_ROAD && m->t[space_y-2][space_x].type != TERRAIN_ROAD && m->t[space_y-1][space_x+1].type != TERRAIN_ROAD && m->t[space_y-2][space_x+1].type != TERRAIN_ROAD) {
 
-                m->t[space_y-1][space_x].type   = 'C';
-                m->t[space_y-2][space_x].type   = 'C';
-                m->t[space_y-1][space_x+1].type = 'C';
-                m->t[space_y-2][space_x+1].type = 'C';
-                building_placed = 1;
+                    m->t[space_y-1][space_x].type   = 'C';
+                    m->t[space_y-2][space_x].type   = 'C';
+                    m->t[space_y-1][space_x+1].type = 'C';
+                    m->t[space_y-2][space_x+1].type = 'C';
+                    building_placed = 1;
+            }
         }
-    }
+        }
     }
 
     // generates the pokemarts (M) on the opposite side of the pokecenters, same rules follow.
     building_placed = 0;
-    while(building_placed == 0) {
-        space_x = rand() % (COLUMN - 1);
-        space_y = rand() % (ROW - 1);
+    if((rand() % 100) < chance) {
+        while(building_placed == 0) {
+            space_x = rand() % (COLUMN - 2) + 1;
+            space_y = rand() % (ROW - 2) + 1;
 
-        if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
+            if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
 
-            if (m->t[space_y+1][space_x].type != TERRAIN_ROAD && m->t[space_y+1][space_x].type != 'C' && m->t[space_y+2][space_x].type != TERRAIN_ROAD && m->t[space_y+2][space_x].type != 'C' &&
-                m->t[space_y+1][space_x+1].type != TERRAIN_ROAD && m->t[space_y+1][space_x+1].type != 'C' &&
-                m->t[space_y+2][space_x+1].type != TERRAIN_ROAD && m->t[space_y+2][space_x+1].type != 'C') {
-                
-                m->t[space_y+1][space_x].type   = 'M';
-                m->t[space_y+2][space_x].type   = 'M';
-                m->t[space_y+1][space_x+1].type = 'M';
-                m->t[space_y+2][space_x+1].type = 'M';
-                building_placed = 1;
+                if (m->t[space_y+1][space_x].type != TERRAIN_ROAD && m->t[space_y+1][space_x].type != 'C' && m->t[space_y+2][space_x].type != TERRAIN_ROAD && m->t[space_y+2][space_x].type != 'C' &&
+                    m->t[space_y+1][space_x+1].type != TERRAIN_ROAD && m->t[space_y+1][space_x+1].type != 'C' &&
+                    m->t[space_y+2][space_x+1].type != TERRAIN_ROAD && m->t[space_y+2][space_x+1].type != 'C') {
+                    
+                    m->t[space_y+1][space_x].type   = 'M';
+                    m->t[space_y+2][space_x].type   = 'M';
+                    m->t[space_y+1][space_x+1].type = 'M';
+                    m->t[space_y+2][space_x+1].type = 'M';
+                    building_placed = 1;
+                }
             }
         }
     }
