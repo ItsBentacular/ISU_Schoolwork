@@ -1,0 +1,26 @@
+Dijkstras Algorithm
+
+There is a group of nodes (ex 9)
+labeled 1 through 9
+nodes are connected through lines in between them, they are not all connected to each other, only some to others.
+each path has a weight.
+there is a node where you start. (in some cases you can also have a destination node)
+priority queue is needed (heap.c and heap.h are given to us in his code).
+start node has weight 0, as you are already there.
+put nodes into queue with their cost, start is 0, others are infinity.
+queue also has a predecesor for previous node, 0 does NOT have a predecesor.
+look at neighboring nodes, see costs and update costs based on the weight from current point to neighboring point. 
+update pred on neighboring nodes to current node.
+node one is "marked off" as it already has its costs and predecesors calculated.
+repeat this with the lowest costing node until all nodes have cost and pred values.
+if a shorter path is found during the algo, replace cost with lower cost.
+once algo is finished, all you have to do is choose a node you want to travel to, and follow the predecessors all the way to the start node.
+
+reduced key implementation in heap or put a second copy of node and pull second copy that is completed in order to reduce nodes.
+
+my own thoughts:
+change terrain from enum to actual struct, this would allow colored terrain, movement costs, and probably some other benefits that I might need later.
+on this, maybe don't change the enum?? maybe instead make a struct that uses the enums AND adds on to it?
+also make a terrain that is different from mountains called border, same character, just makes it easier for calculation of where NPCs CANNOT go.
+
+different npcs have different terrain costs.
