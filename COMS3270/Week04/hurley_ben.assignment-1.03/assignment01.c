@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "queue.h"
+#include "heap.h"
 #include "terrain_gen.h"
 
 world w;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     terrain seeds[7] = {TERRAIN_WATER, TERRAIN_CLEAR, TERRAIN_CLEAR, TERRAIN_GRASS, TERRAIN_GRASS, TERRAIN_ROCK, TERRAIN_TREES};
 
-    queue q;
+    heap_t h;
 
     char input = ' ';
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         if(w.m[current_x][current_y] == NULL) {
             map *m = malloc(sizeof(map));
 
-            generate_start(TERRAIN_ROCK, m, seeds, &q);
+            generate_start(TERRAIN_BORDER, m, seeds, &h);
             generate_roads(m,w,m->g);
             generate_builds(m, man_dis);
 

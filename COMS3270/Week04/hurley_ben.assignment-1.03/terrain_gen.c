@@ -1,15 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "queue.h"
+#include "heap.h"
 #include "terrain_gen.h"
+#include <limits.h>
 
 #define ROW 21
 #define COLUMN 80
 
+typedef struct gen_point {
+    int x;
+    int y;
+    terrain type;
+    int sequence; // Used to maintain FIFO order in the heap (my old queue code was lacking in comparison to the heap code).
+} gen_point_t;
+
+static int32_t gen_point_compare(const void *key, const void *with) {
+    return ((const gen_point_t *)key)->sequence - ((const gen_point_t *)with)->sequence;
+}
 
 // this function allows the borders to be defined as different values while generating as terrain.
-int generate_start(terrain border, map *m, terrain seeds[7], queue *q){
+int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
+        int sequence_counter = 0;
+
         for(int i = 0; i < ROW; i++) {
             for(int j = 0; j < COLUMN; j++) {
                 if((i == 0 || i == ROW -1) || (j == 0 || j == COLUMN -1)) {
@@ -21,38 +34,45 @@ int generate_start(terrain border, map *m, terrain seeds[7], queue *q){
         }
 
     //queues terrain types at random positions, then places the terrain onto the map.
-    queue_init(q);
+    heap_init(h, gen_point_compare, free);
+
     for(int i = 0; i < 7; i++) {
         int ry = rand() % 19 + 1;
         int rx = rand() % 79 + 1;
+        
+        gen_point_t *pt = malloc(sizeof(*pt));
+        pt->x = rx;
+        pt->y = ry;
+        pt->sequence = sequence_counter++;
+
         // not sure how efficient this switch case is, but it does a pretty good job at allowing the queue to be semi-random by randomizing the ry and rx values within the loop while keeping the terrain types the same.
         switch(i){
-            case 0: queue_enqueue(q, rx, ry, seeds[0]); break;
-
-            case 1: queue_enqueue(q, rx, ry, seeds[1]); break;
-
-            case 2: queue_enqueue(q, rx, ry, seeds[2]); break;
-
-            case 3: queue_enqueue(q, rx, ry, seeds[3]); break;
-
-            case 4: queue_enqueue(q, rx, ry, seeds[4]); break;
-
-            case 5: queue_enqueue(q, rx, ry, seeds[5]); break;
-
-            case 6: queue_enqueue(q, rx, ry, seeds[6]); break;
+            case 0: pt->type = seeds[0]; break;
+            case 1: pt->type = seeds[1]; break;
+            case 2: pt->type = seeds[2]; break;
+            case 3: pt->type = seeds[3]; break;
+            case 4: pt->type = seeds[4]; break;
+            case 5: pt->type = seeds[5]; break;
+            case 6: pt->type = seeds[6]; break;
         }
 
-        m->t[ry][rx].type = seeds[i];
+        heap_insert(h, pt);
+        m->t[ry][rx].type = pt->type;
     }
 
     // generates more terrain around the 'seeds' by checking if the terrains surrounding area is in bounds, then puts the same type of terrain around it, and requeues the new terrain onto the queue and repeats until map is full.
-    while(queue_getSize(q) != 0) {
+    while(h->size > 0) {
         int from_x, from_y;
         terrain from_type;
         int neighbor_x[] = {0,0,1,-1};
         int neighbor_y[] = {-1,1,0,0};
 
-        queue_dequeue(q, &from_x, &from_y, &from_type);
+        // Extract from heap
+        gen_point_t *p = heap_remove_min(h);
+        from_x = p->x;
+        from_y = p->y;
+        from_type = p->type;
+        free(p); // We must free the wrapper, be free!
 
         for(int i = 0; i < 4; i++) {
             int to_x = from_x + neighbor_x[i];
@@ -60,10 +80,17 @@ int generate_start(terrain border, map *m, terrain seeds[7], queue *q){
             if((to_x < COLUMN - 1 && to_x > 0) && (to_y < ROW - 1 && to_y > 0) && m->t[to_y][to_x].type == TERRAIN_EMPTY) {
 
                 m->t[to_y][to_x].type = from_type;
-                queue_enqueue(q,to_x,to_y,from_type);
+                
+                gen_point_t *next_pt = malloc(sizeof(*next_pt));
+                next_pt->x = to_x;
+                next_pt->y = to_y;
+                next_pt->type = from_type;
+                next_pt->sequence = sequence_counter++;
+                heap_insert(h, next_pt);
             }
         }
     }
+    heap_delete(h);
 
     return 0;
 }
@@ -100,19 +127,14 @@ int generate_roads(map *m, world w, gate g[4]) {
         w_gate = rand() % (ROW - 2) + 1;
     }
 
-    m->t[0][n_gate].type = TERRAIN_ROAD;
-    m->t[ROW - 1][s_gate].type = TERRAIN_ROAD;
-    m->t[w_gate][0].type = TERRAIN_ROAD;
-    m->t[e_gate][COLUMN - 1].type = TERRAIN_ROAD;
-
     int road_y = (rand() % 10) + 5;
     int road_x = (rand() % 40) + 20;
 
     // generates the east and west roads.
-    for(int i = 0; i <= road_x; i++) {
+    for(int i = (w.current_x == 0) ? 1 : 0; i <= road_x; i++) {
         m->t[w_gate][i].type = TERRAIN_ROAD;
     }
-    for(int i = COLUMN - 1; i >= road_x; i--) {
+    for(int i = (w.current_x == 400) ? COLUMN - 2 : COLUMN - 1; i >= road_x; i--) {
         m->t[e_gate][i].type = TERRAIN_ROAD;
     }
 
@@ -130,10 +152,10 @@ int generate_roads(map *m, world w, gate g[4]) {
     }
 
     // generates the north and south roads.
-    for(int i = 0; i <= road_y; i++) {
+    for(int i = (w.current_y == 400) ? 1 : 0; i <= road_y; i++) {
         m->t[i][n_gate].type = TERRAIN_ROAD;
     }
-    for(int i = ROW - 1; i >= road_y; i--) {
+    for(int i = (w.current_y == 0) ? ROW - 2 : ROW - 1; i >= road_y; i--) {
         m->t[i][s_gate].type = TERRAIN_ROAD;
     }
 
@@ -154,6 +176,11 @@ int generate_roads(map *m, world w, gate g[4]) {
     g[1].gate_pos = s_gate;
     g[2].gate_pos = e_gate;
     g[3].gate_pos = w_gate;
+
+    if (w.current_y < 400) m->t[0][n_gate].type = TERRAIN_GATE;
+    if (w.current_y > 0) m->t[ROW - 1][s_gate].type = TERRAIN_GATE;
+    if (w.current_x < 400) m->t[e_gate][COLUMN - 1].type = TERRAIN_GATE;
+    if (w.current_x > 0) m->t[w_gate][0].type = TERRAIN_GATE;
 
     return 0;
 }
@@ -219,9 +246,52 @@ int map_print(map *m){
 
     for(int i = 0; i < ROW; i++) {
         for(int j = 0; j < COLUMN; j++) {
-            printf("%c", m->t[i][j].type);
+            if (m->t[i][j].type == TERRAIN_BORDER) {
+                printf("%%");
+            } else if (m->t[i][j].type == TERRAIN_GATE) {
+                printf("#");
+            } else {
+                printf("%c", m->t[i][j].type);
+            }
         }
         printf("\n");
     }
     return 0;
+}
+
+int move_cost(character_type c, terrain t) {
+    switch (c) {
+        case PC:
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GATE: return 10;
+                case TERRAIN_GRASS: return 20;
+                case TERRAIN_CLEAR: return 10;
+                case TERRAIN_POKEM: return 10;
+                case TERRAIN_POKEC: return 10;
+                default: return INT_MAX;
+            }
+        case HIKER:
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GRASS: return 15;
+                case TERRAIN_CLEAR: return 10;
+                case TERRAIN_ROCK: return 15;
+                case TERRAIN_TREES: return 15;
+                case TERRAIN_POKEM: return 50;
+                case TERRAIN_POKEC: return 50;
+                default: return INT_MAX;
+            }
+        case RIVAL:
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GRASS: return 20;
+                case TERRAIN_CLEAR: return 10;
+                case TERRAIN_POKEM: return 50;
+                case TERRAIN_POKEC: return 50;
+                default: return INT_MAX;
+            }
+        default:
+            return INT_MAX;
+    }
 }

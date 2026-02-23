@@ -24,3 +24,44 @@ on this, maybe don't change the enum?? maybe instead make a struct that uses the
 also make a terrain that is different from mountains called border, same character, just makes it easier for calculation of where NPCs CANNOT go.
 
 different npcs have different terrain costs.
+
+
+int32_t move_cost(character_type c, terrain t) {
+    switch (c) {
+        case PC:
+            // PC: Path=10, PMart=10, PCntr=10, TGras=20, SGras=10, Mtn=inf, Forest=inf, Water=inf, Gate=10
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GATE: return 10;
+                case TERRAIN_GRASS: return 20;
+                case TERRAIN_CLEAR: return 10;
+                case 'M': return 10;
+                case 'C': return 10;
+                default: return INT_MAX;
+            }
+        case HIKER:
+            // Hiker: Path=10, PMart=50, PCntr=50, TGras=15, SGras=10, Mtn=15, Forest=15, Water=inf, Gate=inf
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GRASS: return 15;
+                case TERRAIN_CLEAR: return 10;
+                case TERRAIN_ROCK: return 15;
+                case TERRAIN_TREES: return 15;
+                case 'M': return 50;
+                case 'C': return 50;
+                default: return INT_MAX;
+            }
+        case RIVAL:
+            // Rival: Path=10, PMart=50, PCntr=50, TGras=20, SGras=10, Mtn=inf, Forest=inf, Water=inf, Gate=inf
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GRASS: return 20;
+                case TERRAIN_CLEAR: return 10;
+                case 'M': return 50;
+                case 'C': return 50;
+                default: return INT_MAX;
+            }
+        default:
+            return INT_MAX;
+    }
+}

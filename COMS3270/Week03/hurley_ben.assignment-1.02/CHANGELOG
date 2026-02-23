@@ -1,0 +1,9 @@
+02-06-26, 6:00 PM: Refactored code to be in seperate functions and files to make main file more readable.
+
+02-07-26, 11:00 AM: added structs for tile, map, gate, and world, updated functions to match.
+
+02-08-26, 9:00 AM: implemented world system with movement between maps and consistent map tiles.
+
+02-09-26, 8:00 AM: added the "manhattan" factor to generation of pokemarts and pokecenters, making it more unlikely for the centers/marts to spawn as you go out further.
+
+2-10-26, 2:00 PM: refactored the road generation to allow roads to connect between map borders.

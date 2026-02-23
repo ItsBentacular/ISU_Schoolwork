@@ -1,0 +1,8 @@
+This is my assignment 1.02. I implemented the n s e w movements just as specified, and the world is working properly with a boundary of 401x401, with the world by default being initialized to NULL.
+There are a few things that I did not do exactly to the specifications, so I will list them here:
+
+-you must put just 'f' for fly, it will print "where to?", and THEN you are supposed to put in your x and y values.
+
+-For the pokecenter and pokemart frequency I did my own thing, firsly making it more of a linear drop, in which it starts at 100% at 0,0 and then drops to 85%; after that it linearly decreases 1% as you go further into the map, with the absolute lowest value being 10%.
+
+- The edge roads around the map simply have boulders at the end of them instead of gates.
