@@ -1,0 +1,63 @@
+<!--FORMS: needs a name and a spot to put name, then a method set/put, and an action to do with the form once the name has been validated.-->
+<!--<input type='text' we need a name atribute to read/fetch data in the text feed. id is also an important form piece. other attributes such as size are optional.>-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>HTML/JS Forms</title>
+    <script src="test.js"></script>
+</head>
+    <body>
+        <form name ="f1">
+            <fieldset>
+                <legend><b>Redneck Test</b></legend>
+                <br />
+            <label for="username">Government Name: </label>
+            <input type="text" name="uname" id="username" placeholder="what's your name?"/>
+            <br /><br />
+            <label for="password">Address</label> 
+            <input type="password" name="pass" id="password" placeholder="where do you live?"/>
+
+            </fieldset>
+            <fieldset>
+                <legend> Hobbies </legend>
+                <textarea name="feedback" id="feedback" rows="10" cols="50"></textarea>
+                <input type="checkbox" name="hobbies" value="reading" /> Reading
+                <input type="checkbox" name="hobbies" value="drinking" /> Drinking
+                <input type="checkbox" name="hobbies" value="driving" /> Driving
+                <input type="checkbox" name="hobbies" value="fishing" /> Fishing
+            </fieldset>
+
+            <br/><br/>
+
+            <fieldset>
+                <legend>Vehicle Type</legend>
+            <input type="radio" name="cookie" value="Truck" /> Truck
+            <input type="radio" name="cookie" value="Car" /> Not a truck
+            </fieldset>
+
+            <br> <br>
+
+            <fieldset>
+                <legend>Favorite Beer</legend>
+                <select name="Beer type">
+                    <option value="Miller Light">Miller</option>
+                    <option value="Busch">Busch</option>
+                    <option value="Budweiser">Bud</option>
+                    <option value="Sam Adams">Sam Adams</option>
+                    <option value="pussy">I don't drink</option>
+            </fieldset>
+
+
+
+
+            <br /> <br />
+
+            <input type="submit" name="submit" value="submit">
+            <input type="reset" name="reset" value="reset">
+        </form>
+
+
+    </body>
+</html>

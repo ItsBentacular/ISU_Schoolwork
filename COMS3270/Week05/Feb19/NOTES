@@ -1,0 +1,90 @@
+/* for next-next assignment (1.04)
+
+three states for data structure, chase(player, hiker road(er) or swimmer), next turn(all start at zero, dijkstras to calculate next move, make turn equal next move), 
+sequence(the order in which the movement occurs)
+every time a character is created, give them a chase, next turn, and sequence to track their movements.
+whichever is the greatest next turn gets its value moved then added on, if next turn values are same tiebreaker using sequence.
+
+Discreet event simulation is what this is called.
+this allows enemies to dynamically move using the priority queue.
+
+1.04 doesn't have swimmers in it, add them early.
+
+struct character {
+    struct PC * P
+    struct NPC * N
+    char symbol
+    int sequence number, next_turn
+    int x,y for position
+    when making a character, 1 struct is NULL, the other is not.
+
+}
+
+make a comparator for next turn to check which one is larger.
+
+how do the characters move around the map?
+- character map
+map sized array of struct character pointers (as shown above)
+NULL everywhere except where characters appear in the world.
+constant time, more space.
+
+struct world {
+    struct map [401][401]
+    distance maps // only need to be in world space, if pc isn't there no distance map needed
+}
+
+struct map {
+ terrain t [21][80]
+  characters *[21][80]
+}
+
+
+chars are easy to locate, only 1 byte each, no offset
+
+when locating elements, offset is important
+
+char c[100]
+c[57] is literally located at the 57th element
+
+for int, 57 would actually be 228, as ints are 4 bytes each
+
+*(c = 57) == c[57]
+
+the first dereference uses the compiler to multiply the size of each element by the index to get the offset.
+
+void *v;
+
+char *c = v;
+
+c + 10 goes 10 bytes (elements) ahead of c.
+
+if c were an int, c + 10 would go 40 bytes ahead (10 * 4)
+
+int *p = c
+p = &c[0]
+
+these are equivalent
+
+using & on a pointer is useless in some circumstances, as the & symbol is for finding the address, and there isn't an adress for a pointer (it is the address!)
+
+char m [y][x]
+
+the reason it is y then x, is that we iterate properly by going down through a entire row then iterating the next, it is more performant to do [y][x]. 
+Always outermost to innermost.
+
+m[q][p]
+
+really means
+
+m + (q * x) + p
+
+char n[z][y][x]
+
+n[r][q][p]
+
+really means
+
+m + [(r * (x * y)) + (q * x) + p ]
+brackets would be multiplied by the size of the element ex: 1 for char, 4 for int etc..
+
+*/
