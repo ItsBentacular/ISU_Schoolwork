@@ -1,0 +1,7 @@
+02/17/26: 4:00 PM: Refactored code so that all terrain generation code uses the fibbonaci code given by prof. S instead of my own queue implementation.
+
+02/21/26: 11:00 AM: Added movement cost function and added enums for the character types, added function headers for dijkstras.
+
+02/22/26: 2:00 PM: Implemented full dijkstras algo.
+
+02/23/26: 8:00 AM: added print function so that distance maps are displayed.

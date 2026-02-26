@@ -42,10 +42,20 @@ int main(int argc, char *argv[]) {
             generate_start(TERRAIN_BORDER, m, seeds, &h);
             generate_roads(m,w,m->g);
             generate_builds(m, man_dis);
+            place_pc(m);
 
             w.m[current_x][current_y] = m;
         }
         map_print(w.m[current_x][current_y]);
+        int hiker_dist[21][80];
+        int rival_dist[21][80];
+        dijkstra_path(w.m[current_x][current_y], HIKER, hiker_dist);
+        dijkstra_path(w.m[current_x][current_y], RIVAL, rival_dist);
+        printf("Hiker Distance Map:\n");
+        print_dist_map(hiker_dist);
+        printf("Rival Distance Map:\n");
+        print_dist_map(rival_dist);
+
         printf("x: %d y: %d\n", current_x - 200, current_y - 200);
         scanf(" %c", &input); // Added space to consume newline
         switch(input) {

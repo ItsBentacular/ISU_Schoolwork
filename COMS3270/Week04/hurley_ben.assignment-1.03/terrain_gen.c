@@ -250,6 +250,8 @@ int map_print(map *m){
                 printf("%%");
             } else if (m->t[i][j].type == TERRAIN_GATE) {
                 printf("#");
+            } else if (i == m->pc.y && j == m->pc.x) {
+                printf("@");
             } else {
                 printf("%c", m->t[i][j].type);
             }
@@ -269,6 +271,10 @@ int move_cost(character_type c, terrain t) {
                 case TERRAIN_CLEAR: return 10;
                 case TERRAIN_POKEM: return 10;
                 case TERRAIN_POKEC: return 10;
+                case TERRAIN_ROCK: return INT_MAX;
+                case TERRAIN_TREES: return INT_MAX;
+                case TERRAIN_WATER: return INT_MAX;
+                case TERRAIN_BORDER: return INT_MAX;
                 default: return INT_MAX;
             }
         case HIKER:
@@ -280,6 +286,9 @@ int move_cost(character_type c, terrain t) {
                 case TERRAIN_TREES: return 15;
                 case TERRAIN_POKEM: return 50;
                 case TERRAIN_POKEC: return 50;
+                case TERRAIN_WATER: return INT_MAX;
+                case TERRAIN_GATE: return INT_MAX;
+                case TERRAIN_BORDER: return INT_MAX;
                 default: return INT_MAX;
             }
         case RIVAL:
@@ -289,9 +298,148 @@ int move_cost(character_type c, terrain t) {
                 case TERRAIN_CLEAR: return 10;
                 case TERRAIN_POKEM: return 50;
                 case TERRAIN_POKEC: return 50;
+                case TERRAIN_ROCK: return INT_MAX;
+                case TERRAIN_TREES: return INT_MAX;
+                case TERRAIN_WATER: return INT_MAX;
+                case TERRAIN_GATE: return INT_MAX;
+                case TERRAIN_BORDER: return INT_MAX;
+                default: return INT_MAX;
+            }
+        case SWIMMER:
+            switch (t) {
+                case TERRAIN_ROAD: return INT_MAX;
+                case TERRAIN_GRASS: return INT_MAX;
+                case TERRAIN_CLEAR: return INT_MAX;
+                case TERRAIN_POKEM: return INT_MAX;
+                case TERRAIN_POKEC: return INT_MAX;
+                case TERRAIN_ROCK: return INT_MAX;
+                case TERRAIN_TREES: return INT_MAX;
+                case TERRAIN_WATER: return 7;
+                case TERRAIN_GATE: return INT_MAX;
+                case TERRAIN_BORDER: return INT_MAX;
+                default: return INT_MAX;
+            }
+        case OTHER:
+            switch (t) {
+                case TERRAIN_ROAD: return 10;
+                case TERRAIN_GRASS: return 20;
+                case TERRAIN_CLEAR: return 10;
+                case TERRAIN_POKEM: return 50;
+                case TERRAIN_POKEC: return 50;
+                case TERRAIN_ROCK: return INT_MAX;
+                case TERRAIN_TREES: return INT_MAX;
+                case TERRAIN_WATER: return INT_MAX;
+                case TERRAIN_GATE: return INT_MAX;
+                case TERRAIN_BORDER: return INT_MAX;
                 default: return INT_MAX;
             }
         default:
             return INT_MAX;
+    }
+}
+
+void place_pc(map *m) {
+    int placed = 0;
+    while (!placed) {
+        int x = rand() % (COLUMN - 2) + 1;
+        int y = rand() % (ROW - 2) + 1;
+
+        if (m->t[y][x].type == TERRAIN_ROAD && m->t[y][x].type != TERRAIN_GATE) {
+            m->pc.x = x;
+            m->pc.y = y;
+            m->pc.type = PC;
+            placed = 1;
+        }
+    }
+}
+
+typedef struct path_node {
+    int x;
+    int y;
+    int cost;
+} path_node_t;
+
+static int32_t path_cmp(const void *key, const void *with) {
+    return ((const path_node_t *)key)->cost - ((const path_node_t *)with)->cost;
+}
+
+void dijkstra_path(map *m, character_type type, int dist[21][80]) {
+    heap_t h;
+    heap_init(&h, path_cmp, free);
+
+    heap_node_t *nodes[ROW][COLUMN];
+
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COLUMN; j++) {
+            dist[i][j] = INT_MAX;
+            nodes[i][j] = NULL;
+        }
+    }
+
+    dist[m->pc.y][m->pc.x] = 0;
+
+    // Initialize heap with all nodes
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COLUMN; j++) {
+            path_node_t *pn = malloc(sizeof(path_node_t));
+            pn->x = j;
+            pn->y = i;
+            pn->cost = dist[i][j];
+            nodes[i][j] = heap_insert(&h, pn);
+        }
+    }
+
+    int neighbor_x[] = {0, 0, 1, -1, 1, -1, 1, -1};
+    int neighbor_y[] = {-1, 1, 0, 0, -1, -1, 1, 1};
+
+    while (h.size > 0) {
+        path_node_t *u = heap_remove_min(&h);
+        int ux = u->x;
+        int uy = u->y;
+        int ucost = u->cost;
+        
+        // stop if we pulled an unreachable node, but we want to process everything reachable (duh)
+        if (ucost == INT_MAX) {
+            free(u);
+            break; 
+        }
+
+        for (int i = 0; i < 8; i++) {
+            int vx = ux + neighbor_x[i];
+            int vy = uy + neighbor_y[i];
+
+            if (vx >= 0 && vx < COLUMN && vy >= 0 && vy < ROW) {
+                int weight = move_cost(type, m->t[vy][vx].type);
+                
+                if (weight != INT_MAX) {
+                    int alt = ucost + weight;
+                    if (alt < dist[vy][vx]) {
+                        dist[vy][vx] = alt;
+                        
+                        path_node_t *vn = malloc(sizeof(path_node_t));
+                        vn->x = vx;
+                        vn->y = vy;
+                        vn->cost = alt;
+                        
+                        heap_decrease_key(&h, nodes[vy][vx], vn);
+                    }
+                }
+            }
+        }
+        free(u);
+    }
+    heap_delete(&h);
+}
+
+void print_dist_map(int dist[21][80]) {
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COLUMN; j++) {
+            if (dist[i][j] == INT_MAX) {
+                printf("   ");
+            } else {
+                printf("%02d ", dist[i][j] % 100);
+            }
+        }
+        printf("\n");
     }
 }

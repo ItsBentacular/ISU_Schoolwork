@@ -47,6 +47,7 @@ typedef struct map {
     gate g[4];
     
     tile t[21][80];
+    character pc;
 
 } map;
 
@@ -66,5 +67,8 @@ int map_print(map *m);
 
 int move_cost(character_type c, terrain t);
 
+void place_pc(map *m);
+void dijkstra_path(map *m, character_type type, int dist[21][80]);
+void print_dist_map(int dist[21][80]);
 
 #endif

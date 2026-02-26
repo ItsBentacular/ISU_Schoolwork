@@ -1,0 +1,3 @@
+This is my assignment 1.03, I implemented requirements as asked, and made a function both for dijkstras and for the determination of the movement costs. distance maps are implemented and are labeled. I have all types of trainer types: PC,
+Hiker, Rival, Swimmer, and other; their values are also all there. I made seperate terrain types for mountains and boulders using the ASCII code that pertains to the symbol rather than 2 duplicated symbols. PC is drawn, and movement
+is calculated in all 8 directions with 2 arrays for positioning.
