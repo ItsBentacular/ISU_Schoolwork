@@ -46,3 +46,6 @@ std::ostream is a keyword for writing somewhere anywhere in the computer.
 1-26-26, 5:37 PM, done with the ppm generator, idk why but it's so cool to me, making graphics is just cool, and I hope to learn how to make graphics from scratch on my own (no tutorial someday).
 its just crazy to me that all images are within computers are just numbers, ppm files are easier to understand that because you can LITERALLY open up the file and see the long line of numbers that
 creates an image. well hopefully after I keep following this tutorial I learn some cool information about graphics programming that I can THEN apply to my OpenGL project.
+
+2-27-26, 9:07 PM, back at it again, accidentally broke my monitor (bad at CS2), working on OPENGL, kinda wanna do this rather than RL, but sometimes you gotta make your friends happy, learning C++ in
+class soon, so hopefully that goes well, I'm honestly tired of my advanced programming class, and very scared for the exam soon, but what can you do?
