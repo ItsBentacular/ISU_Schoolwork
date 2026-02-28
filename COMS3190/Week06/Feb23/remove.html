@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOM remove</title>
+</head>
+<body>
+        <ul id="list">
+    <li> Product Number One </li>
+    <li> Product Number Two </li>
+    <li> Product Number Three</li>
+    <li> Product Number Four </li>
+    </ul>
+
+    <script>
+        var myList = document.getElementById("list");
+        var removeElement = myList.lastChild;
+        myList.removeChild(removeElement);
+    </script>
+</body>
+</html>
