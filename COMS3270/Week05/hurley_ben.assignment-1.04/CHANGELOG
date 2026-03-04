@@ -1,0 +1,7 @@
+02/27/26, 6:00 PM: Added switch for --numtrainers(doesn't do anything) and set up enums to display character info.
+
+03/01/26, 10:00 AM: Revamped character struct so that it can hold data for NPC movement, got place PC and place NPC functions working.
+
+03/03/26, 4:00 PM: Added move NPC function, revamped place PC and NPC functions to use priority queue for holding data, finished numtrainers switch to place npc.
+
+03/04/26, 8:00 AM: finished main file to make npcs move using move_npc function, commented out old code and made the game a "discreet event simulation".
