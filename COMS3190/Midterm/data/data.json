@@ -1,0 +1,36 @@
+{
+  "restaurants": [
+    {
+      "restaurantID": "Blaze Pizza",
+      "restaurantDesc": "Blaze Pizza is one of Ames best pizza places for good pizza at an affordable price!",
+      "foodType": ["Pizza", "Italian"],
+      "location": "Ames",
+      "has_dessert": false,
+      "website": "www.blazepizzaames.com"
+
+    },
+    {
+      "restaurantID": "The Great Plains Sauce & Dough",
+      "restaurantDesc": "The Great Plains Suace & Dough is another one of Ames exemplary pizza locations, focusing on recreating famous pizza types, from Detroit to Chicago (plus more)!",
+      "foodType": ["Pizza", "Italian"],
+      "location": "Ames",
+      "has_dessert": false
+
+    },
+    {
+      "restaurantID": "Hickory Park",
+      "restaurantDesc": "Hickory Park is one of Ames most popular establishments, with all types of BBQ and amazing treats for dessert available! ",
+      "foodType": ["American", "BBQ"],
+      "location": "Ames",
+      "has_dessert": true
+
+    },
+    {
+      "restaurantID": "Hickory Park",
+      "restaurantDesc": "Hickory Park is one of Ames most popular establishments, with all types of BBQ and amazing treats for dessert available! ",
+      "foodType": ["American", "BBQ"],
+      "location": "Ames",
+      "has_dessert": true
+    }
+  ]
+}
