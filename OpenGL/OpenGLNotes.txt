@@ -49,3 +49,5 @@ creates an image. well hopefully after I keep following this tutorial I learn so
 
 2-27-26, 9:07 PM, back at it again, accidentally broke my monitor (bad at CS2), working on OPENGL, kinda wanna do this rather than RL, but sometimes you gotta make your friends happy, learning C++ in
 class soon, so hopefully that goes well, I'm honestly tired of my advanced programming class, and very scared for the exam soon, but what can you do?
+
+side note: if I ever actually make a game, use strudel, it's like fl-studio but you code the music
