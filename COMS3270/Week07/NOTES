@@ -1,0 +1,16 @@
+Switch --numtrainers means add a command line arg
+
+// (int) f gives the values 3.14 -> 3 5.999 -> 5
+// (*(int *) &f) keeps the decimal placements
+
+// you can use ANSI escape codes (you tried this earlier for color in terminal) to do cool things in terminal
+
+// when using curses, you need to use -lncurses to link the library
+
+// raw() in curses allows for unbuffered input (no need to press enter)
+
+//noecho() turns off printing chars to terminal, anything you press does apply, just doesn't print
+
+//curs_set(0) disables cursor showing
+
+//keypad(stdscr, TRUE) enables the tenkey for use
