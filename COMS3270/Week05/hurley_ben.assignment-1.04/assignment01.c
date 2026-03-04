@@ -56,9 +56,10 @@ int main(int argc, char *argv[]) {
                     printf("--numtrainers requires a integer value after.\n");
                     return -1;
                 }
-            } else {
-                place_npc(m,(rand() % (10 - 2) + 2), &npc);
             }
+        }
+        if(argc < 2) {
+            place_npc(m,(rand() % (10 - 2) + 2), &npc);
         }
 
         w.m[current_x][current_y] = m;
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
 
         if(c->type == PC) {
             map_print(cur_map);
-            usleep(250000);
+            usleep(150000);
             
             // move pc, update maps, and loop npc queue
             move_npc(c, cur_map);

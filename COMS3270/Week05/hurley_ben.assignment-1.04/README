@@ -1,0 +1,13 @@
+For this assignment, the PC is randomly moved using the same logic as the explorer. the --numtrainers switch does work, and if not included a 
+random number of NPCs between 2 and 10 is chosen, rival and hiker will ALWAYS be the first two.
+@:PC
+h:hiker
+r:rival
+q:swimmer
+p:pacer
+w:wanderer
+s:sentry
+e:explorer
+swimmer is included in this assignment, and has the same logic as a wanderer.
+I am using the discreet event simulation logic, and no input is taken in this submission of the assignment (other than the numtrainers switch).
+usleep is set to 150000.
