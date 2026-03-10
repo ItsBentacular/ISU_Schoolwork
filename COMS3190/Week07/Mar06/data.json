@@ -1,0 +1,160 @@
+{
+  "restaurants": [
+    {
+      "restaurantID": "Joy's Mongolian Grill",
+      "restaurantDesc": "A local favorite for authentic, high-quality Mongolian and Chinese cuisine. Known for its fresh ingredients and affordable daily specials, it offers everything from classic stir-fry to traditional Szechuan-style hot pots.",
+      "foodType": [
+        "Mongolian",
+        "Chinese"
+      ],
+      "location": "112 Hayward Ave",
+      "location_link": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.975244857853!2d-93.65410642343298!3d42.022263456375015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87ee71e35ad4735b%3A0x16d7c0d9e9697399!2sJoy&#39;s%20Mongolian%20Grill!5e0!3m2!1sen!2sus!4v1772742501298!5m2!1sen!2sus",
+      "has_dessert": false,
+      "website": "https://www.joysmongoliangrill.com/",
+      "imageLink": "../assets/images/joys_mongolian.jpg",
+      "price": "$10-20"
+    },
+    {
+      "restaurantID": "The Great Plains Sauce & Dough",
+      "restaurantDesc": "A downtown Ames staple famous for its customizable crusts, ranging from classic thin white to their signature rolled-edge Denver-style whole wheat. Don't miss their honey-dipped crust tradition or the fan-favorite Taco Pizza.",
+      "foodType": [
+        "Italian",
+        "Pizza"
+      ],
+      "location": "129 Main St #101",
+      "has_dessert": true,
+      "website": "https://www.greatplainspizza.com/",
+      "imageLink": "../assets/images/great_plains.png",
+      "price": "$10-20"
+    },
+    {
+      "restaurantID": "Hickory Park",
+      "restaurantDesc": "An Iowa landmark since 1970, serving massive portions of hickory-smoked BBQ in a nostalgic, family-friendly atmosphere. Famous for its expansive meat selection and an old-fashioned ice cream parlor featuring over 50 sundae varieties.",
+      "foodType": [
+        "American",
+        "BBQ"
+      ],
+      "location": "1404 S Duff Ave",
+      "has_dessert": true,
+      "website": "https://hickoryparkbbq.com/",
+      "imageLink": "../assets/images/hickory_park.png",
+      "price": "$10-20"
+    },
+    {
+      "restaurantID": "Aunt Maude's",
+      "restaurantDesc": "A premier downtown destination for upscale casual dining. Specializing in slow-roasted prime rib and tri-tip, it combines a sophisticated, dimly-lit ambiance with legendary desserts like their chocolate toffee bread pudding.",
+      "foodType": [
+        "American",
+        "Fine Casual"
+      ],
+      "location": "547 Main St",
+      "has_dessert": true,
+      "website": "https://auntmaudes.com/",
+      "imageLink": "../assets/images/aunt_maude.jpg",
+      "price": "$20-30"
+    },
+    {
+      "restaurantID": "The Cafe",
+      "restaurantDesc": "A popular neighborhood spot on the north side of Ames known for scratch-made breakfasts, seasonal Midwestern comfort food, and a bakery case full of rotating pastries.",
+      "foodType": [
+        "American",
+        "Breakfast"
+      ],
+      "location": "2616 Northridge Pkwy",
+      "has_dessert": true,
+      "website": "https://thecafeames.com/",
+      "imageLink": "../assets/images/the_cafe.jpg",
+      "price": "$10-25"
+    },
+    {
+      "restaurantID": "Cornbred Barbecue",
+      "restaurantDesc": "A modern BBQ joint in north Ames serving smoked brisket, ribs, and creative Southern sides in a lively, rustic-industrial setting with a full bar.",
+      "foodType": [
+        "American",
+        "BBQ"
+      ],
+      "location": "526 Main St #106",
+      "has_dessert": true,
+      "website": "https://cornbredbbq.com/",
+      "imageLink": "../assets/images/cornbred_bbq.jpg",
+      "price": "$18-30"
+    },
+    {
+      "restaurantID": "Cafe Beaudelaire",
+      "restaurantDesc": "A cozy Brazilian-inspired cafe and bar in Campustown offering burgers, Brazilian bar food, and craft cocktails with frequent live music and a laid-back vibe.",
+      "foodType": [
+        "Brazilian",
+        "Bar"
+      ],
+      "location": "2504 Lincoln Way",
+      "has_dessert": false,
+      "website": "https://cafebeaudelaire.com/",
+      "imageLink": "../assets/images/cafe_beaudelaire.jpg",
+      "price": "$10-20"
+    },
+    {
+      "restaurantID": "Dublin Bay Irish Pub & Grill",
+      "restaurantDesc": "An Irish pub-style restaurant featuring hearty classics like shepherd’s pie and fish and chips, a large beer selection, and dark-wood, cozy interiors.",
+      "foodType": [
+        "Irish",
+        "Pub"
+      ],
+      "location": "320 S 16th St",
+      "has_dessert": true,
+      "website": "https://dublinbayames.com/",
+      "imageLink": "../assets/images/dublin_bay.jpg",
+      "price": "$15-25"
+    },
+    {
+      "restaurantID": "Provisions Lot F",
+      "restaurantDesc": "A chef-driven eatery and bakery in Somerset offering elevated American dishes, house-made breads, and an open, airy dining room with an attached market.",
+      "foodType": [
+        "American",
+        "Bakery"
+      ],
+      "location": "2400 N Loop Dr",
+      "has_dessert": true,
+      "website": "https://www.provisionsames.com/",
+      "imageLink": "../assets/images/provisions_lotF.jpg",
+      "price": "$15-25"
+    },
+    {
+      "restaurantID": "The Mucky Duck Pub",
+      "restaurantDesc": "A British-style pub serving fish and chips, curries, and UK-inspired comfort food along with a strong draft list and soccer on TV.",
+      "foodType": [
+        "British",
+        "Pub"
+      ],
+      "location": "3100 S Duff Ave",
+      "has_dessert": false,
+      "website": "https://www.muckyduckpub.com/",
+      "imageLink": "../assets/images/the_mucky_duck.jpg",
+      "price": "$15-30"
+    },
+    {
+      "restaurantID": "El Azteca",
+      "restaurantDesc": "A long-running Mexican restaurant offering a wide menu of combo plates, fajitas, and margaritas in a casual, family-friendly dining room.",
+      "foodType": [
+        "Mexican"
+      ],
+      "location": "2120 Issac Newton Dr",
+      "has_dessert": true,
+      "website": "https://elaztecaames.com/",
+      "imageLink": "../assets/images/el_azteca.jpg",
+      "price": "$10-20"
+    },
+    {
+      "restaurantID": "Wallaby's Bar & Grille",
+      "restaurantDesc": "A Cyclone-themed sports bar and grill featuring burgers, sandwiches, and pub classics, plus a popular rooftop patio packed on game days.",
+      "foodType": [
+        "American",
+        "Bar"
+      ],
+      "location": "2733 Stange Rd",
+      "has_dessert": true,
+      "website": "https://www.wallabysbarandgrille.com/",
+      "imageLink": "../assets/images/wallabys.jpg",
+      "price": "$15-25"
+    }
+  ]
+}
