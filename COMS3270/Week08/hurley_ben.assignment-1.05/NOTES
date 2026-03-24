@@ -1,0 +1,31 @@
+To incorporate ncurses for both rendering and player control without using any code, you will need to adjust how your game loop processes the PC's turn and how your map drawing function interacts with the terminal.
+
+Here is the conceptual breakdown of the changes you need to make across your files:
+
+1. Updating the Display (terrain_gen.c)
+Right now, your map_print function loops through your 2D array and uses standard output (printf and \n) to draw the map.
+
+Replace Standard Output: You will need to strip out all the printf calls inside map_print. Instead, use ncurses functions like mvaddch (move to an x,y coordinate and add a character) or addch.
+Refresh the Screen: Ncurses draws to a back buffer first. At the very end of your map_print function (after the nested loops finish), you must call refresh() to tell ncurses to push the updated map to the actual terminal screen.
+Clean Up Other Outputs: Go through your files and find any other printf statements (like error messages or debugging info). Standard printf will mess up an ncurses screen. You should either remove them, comment them out, or replace them with ncurses print functions directed to a specific message line at the top or bottom of the screen.
+2. Handling Player Input (curse_main.c)
+Currently, when the PC is popped from your priority queue (heap), your main loop prints the map, sleeps for a fraction of a second, and then moves the PC automatically using the "explorer" logic.
+
+Wait for the User: Instead of sleeping, you should call getch() during the PC's turn. Because you have already initialized ncurses in cbreak mode, getch() will pause the game loop and wait for the user to press a key.
+Map the Controls: Once getch() captures a keystroke, use a switch statement to determine what the user wants to do. You can map the standard arrow keys, the numpad, or the traditional roguelike vi-keys (h, j, k, l, y, u, b, n) to specific X and Y direction changes.
+Handle Quitting: Add a case in your switch statement for a "quit" key (like 'Q' or Escape). When pressed, this should break you out of your infinite game loop so you can free your memory, safely shut down ncurses using endwin(), and exit the program.
+3. Updating PC Movement Logic (terrain_gen.c)
+Since the PC no longer moves randomly, you need to update how move_npc handles the PC case.
+
+Remove Random Walking: Take out the random direction generator under the PC case in your move_npc function.
+Validate the Move: Take the requested X and Y changes from the player's input in curse_main.c and verify them. You need to check if the new destination tile has a valid movement cost (not INT_MAX) and isn't already occupied by an NPC.
+Execute or Reject: If the move is valid, update the PC's coordinates, update the map's character pointer array, and calculate the cost of the terrain to figure out the PC's next turn time. If the move is invalid (like trying to walk into a boulder or an NPC), you can either loop back and ask the player for another input using getch() again, or simply pass the turn without moving.
+Summary of the New Game Loop
+Pop a character from the heap.
+If it's an NPC, calculate their move, update their next turn time, and put them back in the heap.
+If it's the PC:
+Draw the map and refresh the screen.
+Wait for the player to press a key.
+If they move, calculate the new position, check if it's walkable, update the PC's coordinates, and calculate the turn cost.
+Put the PC back in the heap.
+If they quit, break the loop, call endwin(), and terminate.

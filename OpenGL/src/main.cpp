@@ -1,13 +1,41 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-using namespace std;
+#include <unistd.h>
+#include <fstream>
+#include <sstream>
+
+// helper function
+std::string loadGamepadMappings() {
+    const std::string& path = "../OpenGL/include/inputs/gamecontrollerdb.txt";
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open gamepad mappings file: " << path << std::endl;
+        return "";
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 const int SRC_WIDTH = 800;
 const int SRC_HEIGHT = 600;
+
+void listConnectedJoysticks() {
+    for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; i++) {
+        if (glfwJoystickPresent(i)) {
+            const char* name = glfwGetJoystickName(i);
+            if (name) {
+                printf("Joystick ID %d is present. Name: %s\n", i, name);
+            } else {
+                printf("Joystick ID %d is present, but name is unavailable.\n", i);
+            }
+        }
+    }
+}
 
 int main()
 {
@@ -16,6 +44,15 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    listConnectedJoysticks();
+    std::string mappings = loadGamepadMappings();
+    if(!mappings.empty()) {
+        if(glfwUpdateGamepadMappings(mappings.c_str()) == GLFW_TRUE) {
+            std::cout << "Gamepad load Good!" << std::endl;
+        } else {
+            std::cout << "Gamepad load Bad!" << std::endl;
+        }
+    } 
 
     // creates the pointer to the window with a size and name, other two parameters are for specifying which monitor display, and for "sharing" resources, whatever that means.
     GLFWwindow* window = glfwCreateWindow(SRC_WIDTH,SRC_HEIGHT, "BenHurley2026", NULL, NULL);
@@ -32,7 +69,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     //if glad isn't loaded correctly, terminate.
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        cout << "Failed to initialize GLAD" << endl;
+        std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
@@ -45,6 +82,15 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwSwapBuffers(window);
+        
+        GLFWgamepadstate state;
+        if (glfwGetGamepadState(GLFW_JOYSTICK_5, &state))
+                {
+                    if (state.buttons[GLFW_GAMEPAD_BUTTON_A])
+                    {
+                        std::cout << "A IS PRESSED" << std::endl;
+                    }
+                }
         glfwPollEvents();
     }
 

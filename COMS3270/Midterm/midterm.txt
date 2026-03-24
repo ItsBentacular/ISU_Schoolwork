@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     typedef list_item_t * list_iterator_t;
 
-    typedef struct list {
+    typedef struct list { 
         list_item_t *head, *tail;
         uint32_t length;
         int32_t (*compare)
