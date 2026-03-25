@@ -63,10 +63,10 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        generate_names(m);
         if(argc < 2) {
             place_npc(m,(rand() % (10 - 2) + 2), &npc);
         }
+        generate_names(m);
 
         w.m[current_x][current_y] = m;
     }
@@ -79,20 +79,27 @@ int main(int argc, char *argv[]) {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
-
-    start_color();
-    //use_default_colors();
+    scrollok(stdscr,TRUE);
+    WINDOW *trainerPad;
+    if(has_colors()) {
+        start_color();
+    }
     short COLOR_BROWN = 10;
     init_color(COLOR_BROWN, 545, 270, 74);
     short COLOR_GREY = 11;
     init_color(COLOR_GREY, 650,650,600);
+    short COLOR_GRASS_BACK = 10;
+    init_color(COLOR_GRASS_BACK, 545, 270, 74);
+    short COLOR_OCEAN = 11;
+    init_color(COLOR_OCEAN, 650,650,600);
 
-    init_pair(1, COLOR_BLUE, COLOR_BLACK); // water
-    init_pair(2, COLOR_GREEN, COLOR_BLACK); // grass path
-    init_pair(3, COLOR_YELLOW, COLOR_BLACK); // road
-    init_pair(4, COLOR_GREY, COLOR_BLACK); // mountain
-    init_pair(5, COLOR_BROWN, COLOR_BLACK); // tree
-    init_pair(6, COLOR_WHITE, COLOR_BLACK); // poke-buildings
+
+    init_pair(1, COLOR_BLUE, COLOR_BLUE); // water
+    init_pair(2, COLOR_GREEN, COLOR_GREEN); // grass path
+    init_pair(3, COLOR_YELLOW, COLOR_YELLOW); // road
+    init_pair(4, COLOR_GREY, COLOR_GREY); // mountain
+    init_pair(5, COLOR_BROWN, COLOR_BROWN); // tree
+    init_pair(6, COLOR_WHITE, COLOR_RED); // poke-buildings
 
     while(runGame) {
         character *c = (character *)heap_remove_min(&npc);
@@ -193,46 +200,73 @@ int main(int argc, char *argv[]) {
                     tookTurn = 1;
                     break;
                     case '>':
+                    if(cur_map->t[c->y][c->x].type == TERRAIN_POKEC || cur_map->t[c->y][c->x].type == TERRAIN_POKEM) {
+                        mvhline(0, 0, ' ', 80);
+                        if(cur_map->t[c->y][c->x].type == TERRAIN_POKEC) {
+                            mvprintw(0, 0, "Welcome to the PokeCenter!");
+                        }
+                        if(cur_map->t[c->y][c->x].type == TERRAIN_POKEM) {
+                            mvprintw(0, 0, "Welcome to the PokeMart!");
+                        }
+                        char menu_input = 0;
+                        while(menu_input != '<') {
+                            menu_input = getch();
+                        }
+                    }
                     break;
                     case '5': case '.': case ' ':
                     tookTurn = 1;
                     break;
                     case 't':
+                    int tpadx = 21;
+                    int tpady = 100;
+                    trainerPad = newpad(tpadx, tpady);
                     // 1. Clear the entire screen (rows 0 through 23)
                     for(int i = 0; i < 24; i++) {
+                        usleep(10000);
                         mvhline(i, 0, ' ', 80);
+                        refresh();
                     }
-                    
                     // 2. Draw some placeholder menu text and refresh the screen
-                    mvprintw(0, 0, "Trainer List");
-                    mvprintw(1, 0, "--------------");
+                    mvwprintw(trainerPad, 0, 0, "Trainer List");
+                    mvwprintw(trainerPad, 1, 0, "--------------");
                     int placedNPC = 1;
                     for(int i = 0; i < 21; i++) {
                         for(int j = 0; j < 80; j++) {
                             if(cur_map->characters[i][j] != NULL && cur_map->characters[i][j]->type != PC) {
                                 placedNPC++;
-                                mvprintw(placedNPC, 0, " %c  %s    X: %d, Y: %d ", cur_map->characters[i][j]->type, cur_map->characters[i][j]->charName, cur_map->characters[i][j]->x, cur_map->characters[i][j]->y);
+                                mvwprintw(trainerPad, placedNPC, 0, " %c  %s    X: %d, Y: %d ", cur_map->characters[i][j]->type, cur_map->characters[i][j]->charName, cur_map->characters[i][j]->x, cur_map->characters[i][j]->y);
+                                //mvprintw(placedNPC, 0, " %c  %s    X: %d, Y: %d ", cur_map->characters[i][j]->type, cur_map->characters[i][j]->charName, cur_map->characters[i][j]->x, cur_map->characters[i][j]->y);
                             }
                         }
 
                     }
-                    refresh();
+
+                    prefresh(trainerPad, 0, 0, 0, 0, 300, 50);
 
                     // 3. Wait for the user to press the Escape key (ASCII 27)
                     int menu_input = 0;
                     while(menu_input != 27) {
                         menu_input = getch();
+                        if(menu_input == 'a') {
+                            wscrl(trainerPad, 1);
+                        }
+                        if(menu_input == 'z') {
+                            wscrl(trainerPad, 1);
+                        }
                     }
 
                     // 4. Redraw the main game map and UI before returning to the game loop
                     map_print(cur_map);
                     mvhline(0, 0, ' ', 80);
+                    mvhline(22, 0, ' ', 80);
+                    mvhline(23, 0, ' ', 80);
+                    mvhline(24, 0, ' ', 80);
+                    mvhline(0, 0, ' ', 80);
                     mvprintw(0, 0, "A wild foobar appears!");
+                    mvprintw(22, 0, " ");
+                    mvprintw(23, 0, "Use y/k/u/l/n/j/b/h to move. Press 'Q' to quit.");
                     refresh();
-                    break;
-                    case KEY_UP:
-                    break;
-                    case KEY_DOWN:
                     break;
                     default:
                     break;
@@ -251,6 +285,7 @@ int main(int argc, char *argv[]) {
             heap_insert(&npc, c);
         }
     }
+    delwin(trainerPad);
     endwin();
 
     for(int i = 0; i < 401; i++) {

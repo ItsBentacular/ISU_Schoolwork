@@ -22,29 +22,19 @@ class string3270 {
 
         // you can use a .operator==() to make comparisons, so really you only need one var for comparison
         bool operator==(string3270 &str);
-
         bool operator!=(string3270 &str);
-
         bool operator>=(string3270 &str);
-
         bool operator<=(string3270 &str);
-
         bool operator>(string3270 &str);
-
         bool operator<(string3270 &str);
 
         // & refers to the original, its saying change the original rather than make a copy.
         string3270 &operator+=(string3270 &str);
-
         string3270 &operator+=(const char *str);
-
         string3270 operator+(string3270 &str);
-
         string3270 operator+(const char *str);
-
-        string3270 operator=(string3270 &str);
-
-        string3270 operator=(const char *str);
+        string3270 &operator=(string3270 &str);
+        string3270 &operator=(const char *str);
 
         int index_of(char c);
 
@@ -57,6 +47,9 @@ class string3270 {
 
 };
 
-    //ostream &operator<<(ostream &o, const string3270 &s);
+    ostream &operator<<(ostream &o, const string3270 &s);
 
+    istream &operator>>(istream &i, const string3270 &s);
+
+    
 #endif

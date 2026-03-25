@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <ncurses.h>
 #include <string.h>
+#include <unistd.h>
 
 #define ROW 21
 #define COLUMN 80
@@ -254,6 +255,7 @@ int generate_builds(map *m, int man_dis) {
 
 // prints final map of terrain.
 int map_print(map *m){
+    static int initialMap = 0;
 
     for(int i = 0; i < ROW; i++) {
         for(int j = 0; j < COLUMN; j++) {
@@ -303,8 +305,13 @@ int map_print(map *m){
                     attroff(COLOR_PAIR(6));
                 }
             }
+            if(!initialMap) {
+            usleep(1000);
+            refresh();
+            }
         }
     }
+    initialMap = 1;
     refresh();
     return 0;
 }
@@ -547,7 +554,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             break;
             case 5:
             // sentry
-                if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
+                if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL && m->t[y][x].type != TERRAIN_POKEC && m->t[y][x].type != TERRAIN_POKEM) {
                     character *new_sentry = malloc(sizeof(character));
                     if(new_sentry == NULL){
                         printf("character failed to spawn: Sentry");
