@@ -1,0 +1,7 @@
+03/22/26, 7:00 PM: implemented rough ncurses structure to code, removed old print code, added player movement.
+
+03/23/26, 1:00 PM: added color to terminal, improved ncurses implementation, added trainer menu, added placeholder for pokemarts/pokecenters, renamed files for clarity (assignment01.c to curse_main.c, terrain_gen to poke_logic).
+
+03/24/26, 5:00 PM: improved trainer menu, fixed bugs in trainer menu and pivoted from clearing terminal to using ncurses pads, implemented scrolling in trainer menu, added basic battle menu.
+
+03/25/26, 8:00 AM: added isDefeated int to NPC struct to disable movement when defeated, fixed small bugs with movement, added character swapping so that if an NPC is defeated, when trying to move past them you swap positions.

@@ -52,7 +52,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
         int ry = rand() % 19 + 1;
         int rx = rand() % 79 + 1;
         
-        gen_point_t *pt = malloc(sizeof(*pt));
+        gen_point_t *pt = (gen_point_t *)malloc(sizeof(*pt));
         pt->x = rx;
         pt->y = ry;
         pt->sequence = sequence_counter++;
@@ -80,7 +80,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
         int neighbor_y[] = {-1,1,0,0};
 
         // Extract from heap
-        gen_point_t *p = heap_remove_min(h);
+        gen_point_t *p = (gen_point_t *)heap_remove_min(h);
         from_x = p->x;
         from_y = p->y;
         from_type = p->type;
@@ -93,7 +93,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
 
                 m->t[to_y][to_x].type = from_type;
                 
-                gen_point_t *next_pt = malloc(sizeof(*next_pt));
+                gen_point_t *next_pt = (gen_point_t *)malloc(sizeof(*next_pt));
                 next_pt->x = to_x;
                 next_pt->y = to_y;
                 next_pt->type = from_type;
@@ -217,10 +217,10 @@ int generate_builds(map *m, int man_dis) {
         if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
                 if (m->t[space_y-1][space_x].type != TERRAIN_ROAD && m->t[space_y-2][space_x].type != TERRAIN_ROAD && m->t[space_y-1][space_x+1].type != TERRAIN_ROAD && m->t[space_y-2][space_x+1].type != TERRAIN_ROAD) {
 
-                    m->t[space_y-1][space_x].type   = 'C';
-                    m->t[space_y-2][space_x].type   = 'C';
-                    m->t[space_y-1][space_x+1].type = 'C';
-                    m->t[space_y-2][space_x+1].type = 'C';
+                    m->t[space_y-1][space_x].type   = (terrain)'C';
+                    m->t[space_y-2][space_x].type   = (terrain)'C';
+                    m->t[space_y-1][space_x+1].type = (terrain)'C';
+                    m->t[space_y-2][space_x+1].type = (terrain)'C';
                     building_placed = 1;
             }
         }
@@ -240,10 +240,10 @@ int generate_builds(map *m, int man_dis) {
                     m->t[space_y+1][space_x+1].type != TERRAIN_ROAD && m->t[space_y+1][space_x+1].type != 'C' &&
                     m->t[space_y+2][space_x+1].type != TERRAIN_ROAD && m->t[space_y+2][space_x+1].type != 'C') {
                     
-                    m->t[space_y+1][space_x].type   = 'M';
-                    m->t[space_y+2][space_x].type   = 'M';
-                    m->t[space_y+1][space_x+1].type = 'M';
-                    m->t[space_y+2][space_x+1].type = 'M';
+                    m->t[space_y+1][space_x].type   = (terrain)'M';
+                    m->t[space_y+2][space_x].type   = (terrain)'M';
+                    m->t[space_y+1][space_x+1].type = (terrain)'M';
+                    m->t[space_y+2][space_x+1].type = (terrain)'M';
                     building_placed = 1;
                 }
             }
@@ -409,7 +409,7 @@ void place_pc(map *m, heap_t *h) {
         int y = rand() % (ROW - 2) + 1;
 
         if (m->t[y][x].type == TERRAIN_ROAD && m->t[y][x].type != TERRAIN_GATE && m->characters[y][x] == NULL) {
-            character *player_char = malloc(sizeof(character));
+            character *player_char = (character *)malloc(sizeof(character));
             if(player_char == NULL) {
                 printf("failed to place character, reccommend restart");
                 return;
@@ -450,7 +450,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 0:
             //hiker
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->characters[y][x] == NULL) {
-                    character *new_hiker = malloc(sizeof(character));
+                    character *new_hiker = (character *)malloc(sizeof(character));
                     if(new_hiker == NULL){
                         printf("character failed to spawn: Hiker");
                         break;
@@ -471,7 +471,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 1:
             //rival
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_rival = malloc(sizeof(character));
+                    character *new_rival = (character *)malloc(sizeof(character));
                     if(new_rival == NULL){
                         printf("character failed to spawn: Rival");
                         break;
@@ -492,7 +492,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 2:
             // swimmer
                 if (m->t[y][x].type == TERRAIN_WATER && m->characters[y][x] == NULL) {
-                    character *new_swimmer = malloc(sizeof(character));
+                    character *new_swimmer = (character *)malloc(sizeof(character));
                     if(new_swimmer == NULL){
                         printf("character failed to spawn: Swimmer");
                         break;
@@ -513,7 +513,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 3:
             // pacer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_pacer = malloc(sizeof(character));
+                    character *new_pacer = (character *)malloc(sizeof(character));
                     if(new_pacer == NULL){
                         printf("character failed to spawn: Pacer");
                         break;
@@ -534,7 +534,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 4:
             // wanderer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_wanderer = malloc(sizeof(character));
+                    character *new_wanderer = (character *)malloc(sizeof(character));
                     if(new_wanderer == NULL){
                         printf("character failed to spawn: Wanderer");
                         break;
@@ -555,7 +555,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 5:
             // sentry
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL && m->t[y][x].type != TERRAIN_POKEC && m->t[y][x].type != TERRAIN_POKEM) {
-                    character *new_sentry = malloc(sizeof(character));
+                    character *new_sentry = (character *)malloc(sizeof(character));
                     if(new_sentry == NULL){
                         printf("character failed to spawn: Sentry");
                         break;
@@ -576,7 +576,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 6:
             // explorer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_explorer = malloc(sizeof(character));
+                    character *new_explorer = (character *)malloc(sizeof(character));
                     if(new_explorer == NULL){
                         printf("character failed to spawn: Explorer");
                         break;
@@ -600,7 +600,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
 
 void generate_names(map *m) {
     int randName = 0;
-    char * prefix;
+    const char * prefix;
     const char *names[] = {
         "David", "Sarah", "Peter", "Tequila Sunset", "Raphael Ambrosius Costeau",
         "Felix", "Red", "Char Mustard", "Dave", "Major Major Major",
@@ -643,7 +643,7 @@ void generate_names(map *m) {
                     break;
                 }
                 const char *name = names[randName];
-                m->characters[i][j]->charName = malloc(strlen(prefix) + strlen(name) + 2);
+                m->characters[i][j]->charName = (char *)malloc(strlen(prefix) + strlen(name) + 2);
                 sprintf(m->characters[i][j]->charName, "%s %s", prefix, name);
             }
         }
@@ -805,7 +805,7 @@ void dijkstra_path(map *m, character_type type) {
     // Initialize heap with all nodes
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COLUMN; j++) {
-            path_node_t *pn = malloc(sizeof(path_node_t));
+            path_node_t *pn = (path_node_t *)malloc(sizeof(path_node_t));
             pn->x = j;
             pn->y = i;
             pn->cost = dist[i][j];
@@ -817,7 +817,7 @@ void dijkstra_path(map *m, character_type type) {
     int neighbor_y[] = {-1, 1, 0, 0, -1, -1, 1, 1};
 
     while (h.size > 0) {
-        path_node_t *u = heap_remove_min(&h);
+        path_node_t *u = (path_node_t *)heap_remove_min(&h);
         int ux = u->x;
         int uy = u->y;
         int ucost = u->cost;
@@ -840,7 +840,7 @@ void dijkstra_path(map *m, character_type type) {
                     if (alt < dist[vy][vx]) {
                         dist[vy][vx] = alt;
                         
-                        path_node_t *vn = malloc(sizeof(path_node_t));
+                        path_node_t *vn = (path_node_t *)malloc(sizeof(path_node_t));
                         vn->x = vx;
                         vn->y = vy;
                         vn->cost = alt;

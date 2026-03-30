@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     w.current_y = current_y;
 
     if(w.m[current_x][current_y] == NULL) {
-        map * m = calloc(1, sizeof(map));
+        map * m = (map *)calloc(1, sizeof(map));
 
         heap_init(&npc, character_cmp, NULL);
 
