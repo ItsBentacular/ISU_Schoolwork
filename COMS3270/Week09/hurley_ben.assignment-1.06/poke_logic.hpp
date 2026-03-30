@@ -2,7 +2,7 @@
 #define POKE_H
 #include "heap.h"
 
-typedef enum terrain {
+enum terrain {
     TERRAIN_BORDER = 127,
     TERRAIN_ROCK = '%',
     TERRAIN_WATER = '~',
@@ -14,9 +14,9 @@ typedef enum terrain {
     TERRAIN_EMPTY = ' ',
     TERRAIN_POKEC = 'C',
     TERRAIN_POKEM = 'M'
-} terrain;
+};
 
-typedef enum character_type {
+enum character_type {
         PC = '@',
         HIKER = 'h',
         RIVAL = 'r',
@@ -25,9 +25,10 @@ typedef enum character_type {
         WANDERER = 'w',
         SENTRY = 's',
         EXPLORER = 'e'
-} character_type;
+};
 
-typedef struct character {
+class character {
+public:
     int x;
     int y;
     character_type type;
@@ -36,22 +37,43 @@ typedef struct character {
     int dir_x;
     int dir_y;
     int isDefeated;
-    char * charName; // going to give NPCs random names... Raphael Costeau or Tequila Sunset?
-} character;
+    char * charName; 
 
-typedef struct tile {
+    character() {
+
+    }
+
+    ~character() {}
+};
+
+class tile {
+public:
     int pos_x;
     int pos_y;
     int player;
     terrain type;
     int traverse_cost;
-} tile;
 
-typedef struct gate {
+    // Constructor
+    tile() {
+        pos_x = 0;
+        pos_y = 0;
+        player = 0;
+        type = TERRAIN_EMPTY;
+        traverse_cost = 0;
+    }
+
+    // Destructor
+    ~tile() {}
+};
+
+class gate {
+public:
     int gate_pos;
-} gate;
+};
 
-typedef struct map {
+class map {
+public:
     // gate g[4] goes in order of north, south, east, west
     gate g[4];
     
@@ -60,13 +82,24 @@ typedef struct map {
     int rival_dist[21][80];
     character* characters[21][80];
 
-} map;
+    map() {
 
-typedef struct world{
+    }
+
+    ~map() {}
+
+};
+
+class world{
+public:
         map *m[401][401];
         int current_x;
         int current_y;
-} world;
+    world() {
+
+    }
+    ~world() {}
+};
 
 int generate_start(terrain t_type, map *m, terrain seeds[7], heap_t *h);
 

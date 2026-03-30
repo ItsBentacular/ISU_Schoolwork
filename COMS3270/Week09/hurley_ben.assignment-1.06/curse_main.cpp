@@ -3,7 +3,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "heap.h"
-#include "poke_logic.h"
+#include "poke_logic.hpp"
 #include <string.h>
 #include <ncurses.h>
 #include <limits.h>

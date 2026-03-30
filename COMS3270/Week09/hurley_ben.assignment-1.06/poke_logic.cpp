@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "heap.h"
-#include "poke_logic.h"
+#include "poke_logic.hpp"
 #include <limits.h>
 #include <ncurses.h>
 #include <string.h>

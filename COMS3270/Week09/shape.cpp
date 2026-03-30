@@ -13,7 +13,7 @@ public:
 
     virtual double area()= 0;
 
-    virtual std::ostream &print(std::ostream &) = 0;
+    virtual std::ostream &print(std::ostream &) const = 0;
 
 };
 
@@ -45,7 +45,7 @@ public:
         return side1 * side2;
     }
 
-    virtual std::ostream &print(std::ostream &o) {
+    virtual std::ostream &print(std::ostream &o) const {
         return o << "rectangle[" << side1 << "]" << "[" << side2 << "]";
     }
 
@@ -58,7 +58,28 @@ public:
 
     virtual ~square() {};
 
-    virtual std::ostream &print(std::ostream &o) {
+    virtual std::ostream &print(std::ostream &o) const {
      return o << "square[" << side1 << "]";
     }
 };
+
+int main() {
+    rectangle r(5.0, 10.0);
+    square s(4.0);
+
+    std::cout << "Testing Rectangle:\n";
+    std::cout << r << "\n";
+    std::cout << "Perimeter: " << r.perimeter() << "\n";
+    std::cout << "Area: " << r.area() << "\n\n";
+
+    std::cout << "Testing Square:\n";
+    std::cout << s << "\n";
+    std::cout << "Perimeter: " << s.perimeter() << "\n";
+    std::cout << "Area: " << s.area() << "\n\n";
+
+    shape* shape_ptr = &s;
+    std::cout << "Testing Polymorphism via shape pointer:\n";
+    std::cout << *shape_ptr << " Area: " << shape_ptr->area() << "\n";
+
+    return 0;
+}
