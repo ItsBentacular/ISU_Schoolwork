@@ -29,3 +29,8 @@ Wait for the player to press a key.
 If they move, calculate the new position, check if it's walkable, update the PC's coordinates, and calculate the turn cost.
 Put the PC back in the heap.
 If they quit, break the loop, call endwin(), and terminate.
+
+
+
+
+YOU FORGOT TO ADD FUNCTIONALITY TO MAKE NPC BATTLE TRAINER WHEN THEY ENTER PC SPACE, ONLY THING THAT STARTS BATTLE IS YOU ENTERING THEIR SPACE.
