@@ -52,7 +52,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
         int ry = rand() % 19 + 1;
         int rx = rand() % 79 + 1;
         
-        gen_point_t *pt = (gen_point_t *)malloc(sizeof(*pt));
+        gen_point_t *pt = new gen_point_t;
         pt->x = rx;
         pt->y = ry;
         pt->sequence = sequence_counter++;
@@ -93,7 +93,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
 
                 m->t[to_y][to_x].type = from_type;
                 
-                gen_point_t *next_pt = (gen_point_t *)malloc(sizeof(*next_pt));
+                gen_point_t *next_pt = new gen_point_t();
                 next_pt->x = to_x;
                 next_pt->y = to_y;
                 next_pt->type = from_type;
@@ -409,7 +409,7 @@ void place_pc(map *m, heap_t *h) {
         int y = rand() % (ROW - 2) + 1;
 
         if (m->t[y][x].type == TERRAIN_ROAD && m->t[y][x].type != TERRAIN_GATE && m->characters[y][x] == NULL) {
-            character *player_char = (character *)malloc(sizeof(character));
+            character *player_char = new character();
             if(player_char == NULL) {
                 printf("failed to place character, reccommend restart");
                 return;
@@ -450,20 +450,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 0:
             //hiker
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->characters[y][x] == NULL) {
-                    character *new_hiker = (character *)malloc(sizeof(character));
+                    character *new_hiker = new character(x,y,HIKER,0,0,sequence_num++, 0);
                     if(new_hiker == NULL){
                         printf("character failed to spawn: Hiker");
                         break;
                     }
 
                     m->characters[y][x] = new_hiker;
-                    m->characters[y][x]->type = HIKER;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -471,20 +464,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 1:
             //rival
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_rival = (character *)malloc(sizeof(character));
+                    character *new_rival = new character(x,y,RIVAL,0,0,sequence_num++, 0);
                     if(new_rival == NULL){
                         printf("character failed to spawn: Rival");
                         break;
                     }
 
                     m->characters[y][x] = new_rival;
-                    m->characters[y][x]->type = RIVAL;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -492,20 +478,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 2:
             // swimmer
                 if (m->t[y][x].type == TERRAIN_WATER && m->characters[y][x] == NULL) {
-                    character *new_swimmer = (character *)malloc(sizeof(character));
+                    character *new_swimmer = new character(x,y,SWIMMER,0,0,sequence_num++, 0);
                     if(new_swimmer == NULL){
                         printf("character failed to spawn: Swimmer");
                         break;
                     }
 
                     m->characters[y][x] = new_swimmer;
-                    m->characters[y][x]->type = SWIMMER;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -513,20 +492,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 3:
             // pacer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_pacer = (character *)malloc(sizeof(character));
+                    character *new_pacer = new character(x,y,PACER,0,0,sequence_num++, 0);
                     if(new_pacer == NULL){
                         printf("character failed to spawn: Pacer");
                         break;
                     }
 
                     m->characters[y][x] = new_pacer;
-                    m->characters[y][x]->type = PACER;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -534,20 +506,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 4:
             // wanderer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_wanderer = (character *)malloc(sizeof(character));
+                    character *new_wanderer = new character(x,y,WANDERER,0,0,sequence_num++, 0);
                     if(new_wanderer == NULL){
                         printf("character failed to spawn: Wanderer");
                         break;
                     }
 
                     m->characters[y][x] = new_wanderer;
-                    m->characters[y][x]->type = WANDERER;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -555,20 +520,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 5:
             // sentry
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL && m->t[y][x].type != TERRAIN_POKEC && m->t[y][x].type != TERRAIN_POKEM) {
-                    character *new_sentry = (character *)malloc(sizeof(character));
+                    character *new_sentry = new character(x,y,SENTRY,0,0,sequence_num++, 0);
                     if(new_sentry == NULL){
                         printf("character failed to spawn: Sentry");
                         break;
                     }
 
                     m->characters[y][x] = new_sentry;
-                    m->characters[y][x]->type = SENTRY;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -576,20 +534,13 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
             case 6:
             // explorer
                 if (m->t[y][x].type != TERRAIN_BORDER && m->t[y][x].type != TERRAIN_GATE && m->t[y][x].type != TERRAIN_WATER && m->t[y][x].type != TERRAIN_ROCK && m->t[y][x].type != TERRAIN_TREES && m->characters[y][x] == NULL) {
-                    character *new_explorer = (character *)malloc(sizeof(character));
+                    character *new_explorer = new character(x,y,EXPLORER,0,0,sequence_num++, 0);
                     if(new_explorer == NULL){
                         printf("character failed to spawn: Explorer");
                         break;
                     }
 
                     m->characters[y][x] = new_explorer;
-                    m->characters[y][x]->type = EXPLORER;
-                    m->characters[y][x]->x = x;
-                    m->characters[y][x]->y = y;
-                    m->characters[y][x]->next_turn = 0;
-                    m->characters[y][x]->sequence_num = sequence_num++;
-                    m->characters[y][x]->dir_x = 0;
-                    m->characters[y][x]->dir_y = 0;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
                 }
@@ -643,18 +594,18 @@ void generate_names(map *m) {
                     break;
                 }
                 const char *name = names[randName];
-                m->characters[i][j]->charName = (char *)malloc(strlen(prefix) + strlen(name) + 2);
+                m->characters[i][j]->charName = new char[strlen(prefix) + strlen(name) + 2];
                 sprintf(m->characters[i][j]->charName, "%s %s", prefix, name);
             }
         }
     } 
 }
 
-void move_npc(character *c, map *m) {
+character* move_npc(character *c, map *m) {
     // don't do any calculations if the character is defeated.
     if (c->isDefeated) {
         c->next_turn += move_cost(c->type, m->t[c->y][c->x].type);
-        return; 
+        return NULL; 
     }
     // movement arrays for the npcs that actually do pathfinding starts at right side (going to the right), goes counterclockwise in available movement options.
     int npcMoveX[] = {1,1,0,-1,-1,-1,0,1};
@@ -663,6 +614,7 @@ void move_npc(character *c, map *m) {
     int new_y = c->y;
     int min_dist = INT_MAX;
     int cost = INT_MAX;
+    character *battled = NULL;
 
     // Lazy initialization for directional NPCs
     if ((c->type == PACER || c->type == WANDERER || c->type == EXPLORER || c->type == SWIMMER) && 
@@ -683,6 +635,13 @@ void move_npc(character *c, map *m) {
                 if (tx > 0 && tx < COLUMN - 1 && ty > 0 && ty < ROW - 1) {
                     int dist = (c->type == HIKER) ? m->hiker_dist[ty][tx] : m->rival_dist[ty][tx];
                     
+                    if (m->characters[ty][tx] != NULL && m->characters[ty][tx]->type == PC) {
+                        battled = c;
+                        new_x = c->x;
+                        new_y = c->y;
+                        break;
+                    }
+
                     // Check if spot is better, not occupied, and not infinite cost
                     if (dist < min_dist && m->characters[ty][tx] == NULL && dist != INT_MAX) {
                         min_dist = dist;
@@ -699,8 +658,11 @@ void move_npc(character *c, map *m) {
             
             cost = move_cost(c->type, m->t[new_y][new_x].type);
             
-            // If blocked by terrain or character, turn around
-            if (cost == INT_MAX || m->characters[new_y][new_x] != NULL) {
+            if (m->characters[new_y][new_x] != NULL && m->characters[new_y][new_x]->type == PC) {
+                battled = c;
+                new_x = c->x;
+                new_y = c->y;
+            } else if (cost == INT_MAX || m->characters[new_y][new_x] != NULL) {
                 c->dir_x *= -1;
                 c->dir_y *= -1;
                 new_x = c->x; // Don't move this turn
@@ -713,8 +675,11 @@ void move_npc(character *c, map *m) {
             
             cost = move_cost(c->type, m->t[new_y][new_x].type);
             
-            // If blocked OR terrain type changes, pick new random direction
-            if (cost == INT_MAX || m->characters[new_y][new_x] != NULL || 
+            if (m->characters[new_y][new_x] != NULL && m->characters[new_y][new_x]->type == PC) {
+                battled = c;
+                new_x = c->x;
+                new_y = c->y;
+            } else if (cost == INT_MAX || m->characters[new_y][new_x] != NULL || 
                 m->t[new_y][new_x].type != m->t[c->y][c->x].type) {
                 
                 int dir_idx = rand() % 8;
@@ -733,8 +698,11 @@ void move_npc(character *c, map *m) {
             
             cost = move_cost(c->type, m->t[new_y][new_x].type);
             
-            // Only change direction if blocked by terrain or character
-            if (cost == INT_MAX || m->characters[new_y][new_x] != NULL) {
+            if (m->characters[new_y][new_x] != NULL && m->characters[new_y][new_x]->type == PC) {
+                battled = c;
+                new_x = c->x;
+                new_y = c->y;
+            } else if (cost == INT_MAX || m->characters[new_y][new_x] != NULL) {
                 int dir_idx = rand() % 8;
                 c->dir_x = npcMoveX[dir_idx];
                 c->dir_y = npcMoveY[dir_idx];
@@ -748,7 +716,11 @@ void move_npc(character *c, map *m) {
 
             cost = move_cost(c->type, m->t[new_y][new_x].type);
 
-            if(cost == INT_MAX || m->characters[new_y][new_x] != NULL || m->t[new_y][new_x].type != TERRAIN_WATER) {
+            if (m->characters[new_y][new_x] != NULL && m->characters[new_y][new_x]->type == PC) {
+                battled = c;
+                new_x = c->x;
+                new_y = c->y;
+            } else if(cost == INT_MAX || m->characters[new_y][new_x] != NULL || m->t[new_y][new_x].type != TERRAIN_WATER) {
                 int dir_idx = rand() % 8;
                 c->dir_x = npcMoveX[dir_idx];
                 c->dir_y = npcMoveY[dir_idx];
@@ -772,6 +744,8 @@ void move_npc(character *c, map *m) {
     // If we didn't move (waiting or blocked), we pay the cost of the current tile
     int moveCost = move_cost(c->type, m->t[c->y][c->x].type);
     c->next_turn += moveCost;
+
+    return battled;
 }
 
 typedef struct path_node {
@@ -805,7 +779,7 @@ void dijkstra_path(map *m, character_type type) {
     // Initialize heap with all nodes
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COLUMN; j++) {
-            path_node_t *pn = (path_node_t *)malloc(sizeof(path_node_t));
+            path_node_t *pn = new path_node_t;
             pn->x = j;
             pn->y = i;
             pn->cost = dist[i][j];
@@ -840,7 +814,7 @@ void dijkstra_path(map *m, character_type type) {
                     if (alt < dist[vy][vx]) {
                         dist[vy][vx] = alt;
                         
-                        path_node_t *vn = (path_node_t *)malloc(sizeof(path_node_t));
+                        path_node_t *vn = new path_node_t();
                         vn->x = vx;
                         vn->y = vy;
                         vn->cost = alt;

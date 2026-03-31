@@ -40,8 +40,23 @@ public:
     char * charName; 
 
     character() {
-
+        x = 0;
+        y = 0;
+        type = (character_type)NULL;
+        next_turn = 0;
+        sequence_num = 0;
+        dir_x = 0;
+        dir_y = 0;
+        isDefeated = 0;
+        charName = NULL;
     }
+    character(int x1, int y1, character_type type1, int dir_x1, int dir_y1, int sequence_num1, int next_turn1) {
+        x = x1;
+        y = y1;
+        type = type1;
+        dir_x = dir_x1;
+        dir_y = dir_y1;
+    } 
 
     ~character() {}
 };
@@ -115,7 +130,7 @@ void place_pc(map *m, heap_t*);
 
 void place_npc(map *m, int num_trainers, heap_t *h);
 
-void move_npc(character *c, map *m);
+character* move_npc(character *c, map *m);
 
 void generate_names(map *m);
 

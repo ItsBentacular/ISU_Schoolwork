@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     w.current_y = current_y;
 
     if(w.m[current_x][current_y] == NULL) {
-        map * m = (map *)calloc(1, sizeof(map));
+        map * m = new map();
 
         heap_init(&npc, character_cmp, NULL);
 
@@ -378,7 +378,18 @@ int main(int argc, char *argv[]) {
                 heap_insert(&npc, c);
             }
         } else {
-            move_npc(c, cur_map);
+            character *battled = move_npc(c, cur_map);
+            if (battled) {
+                battle_trainer(battled);
+                map_print(cur_map);
+                mvhline(0, 0, ' ', 80);
+                mvhline(22, 0, ' ', 80);
+                mvhline(23, 0, ' ', 80);
+                mvprintw(0, 0, "A wild foobar appears!");
+                mvprintw(22, 0, " ");
+                mvprintw(23, 0, "Use y/k/u/l/n/j/b/h to move. Press 'Q' to quit.");
+                refresh();
+            }
             heap_insert(&npc, c);
         }
     }
@@ -388,7 +399,7 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < 401; i++) {
         for(int j = 0; j < 401; j++) {
             if(w.m[i][j] != NULL) {
-                free(w.m[i][j]);
+                delete(w.m[i][j]);
             }
         }
     }
