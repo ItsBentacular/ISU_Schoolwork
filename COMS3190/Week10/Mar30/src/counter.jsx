@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 function Counter() {
     const [count, setCount] = useState(0);
+    const [message, setMessage] = useState(0);
+    
     return(
     <div>
     <h1>Counter: {count}</h1>
@@ -29,6 +31,9 @@ function Counter() {
     >
     Mult
     </button>
+    <h3>{message}</h3>
+    <input onChange={(e) => setMessage(e.target.value)} />
+    <button onClick={(e) => alert(message)}>Show</button>
     </div>
     );
 }
