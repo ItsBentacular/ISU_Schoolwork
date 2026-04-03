@@ -1,0 +1,1 @@
+//Generics are called Templates in C++.
