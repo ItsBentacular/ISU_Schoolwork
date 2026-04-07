@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <limits.h>
+#include <string>
 
 
 world w;
@@ -38,6 +39,7 @@ int initialize_world(world *w) {
     return 0;
 }
 
+
 int main(int argc, char *argv[]) {
     srand(time(NULL));
 
@@ -47,6 +49,7 @@ int main(int argc, char *argv[]) {
     int current_y = 200;
 
     int runGame = 1;
+    int debug = 0;
 
 
     terrain seeds[7] = {TERRAIN_WATER, TERRAIN_CLEAR, TERRAIN_CLEAR, TERRAIN_GRASS, TERRAIN_GRASS, TERRAIN_ROCK, TERRAIN_TREES};
@@ -67,21 +70,24 @@ int main(int argc, char *argv[]) {
         heap_init(&npc, character_cmp, NULL);
 
         generate_start(TERRAIN_BORDER, m, seeds, &h);
-        generate_roads(m,w,m->g);
+        generate_roads(m,&w,m->g);
         generate_builds(m, man_dis);
         place_pc(m, &npc);
         for(int i = 1; i < argc; i++) {
             if(strcmp(argv[i], "--numtrainers") == 0) {
                 if(i + 1 < argc) {
                     place_npc(m, atoi(argv[i + 1]), &npc);
-                    i++;
+                    i++;   
                 } else {
                     printf("--numtrainers requires a integer value after.\n");
                     return -1;
                 }
             }
+            if(strcmp(argv[i], "--debug") == 0) {
+            debug = 1;
+            } 
         }
-        if(argc < 2) {
+        if(argc < 2 || debug) {
             place_npc(m,(rand() % (10 - 2) + 2), &npc);
         }
         generate_names(m);
@@ -119,8 +125,13 @@ int main(int argc, char *argv[]) {
     init_pair(5, COLOR_BROWN, COLOR_BROWN); // tree
     init_pair(6, COLOR_WHITE, COLOR_RED); // poke-buildings
 
+    const char *plainMessage = "A wild foobar has appeared!";
+    const char *debugMessage = "Debug Mode Active.";
     while(runGame) {
         character *c = (character *)heap_remove_min(&npc);
+        if (c == NULL) {
+            break; // Safely exit or handle empty heap to prevent a crash
+        }
 
         if(c->type == PC) {
             map_print(cur_map);
@@ -131,11 +142,16 @@ int main(int argc, char *argv[]) {
             mvhline(23, 0, ' ', 80);
             
             // Render the Message display (top line) and Status information (bottom 2 lines)
-            mvprintw(0, 0, "A wild foobar appears!");
+            if(debug == 0) {
+                mvprintw(0, 0, plainMessage);             
+            } else {
+                mvprintw(0, 0, debugMessage);  
+            }
             mvprintw(22, 0, " ");
             mvprintw(23, 0, "Use y/k/u/l/n/j/b/h to move. Press 'Q' to quit.");
             refresh();
             
+            map *old_map = cur_map;
             int tookTurn = 0;
 
             while(!tookTurn && runGame) {
@@ -164,6 +180,29 @@ int main(int argc, char *argv[]) {
                     tookTurn = 1;
                     break;
                     case 'k': case '8':
+                    if(cur_map->t[c->y - 1][c->x].type == TERRAIN_GATE && current_y < 400) {
+                        current_y += 1;
+                        cur_map->characters[c->y][c->x] = NULL;
+                        man_dis = (abs(current_x - 200) + abs(current_y - 200));
+                        w.current_y = current_y;
+                        w.current_x = current_x;
+                        if(w.m[current_x][current_y] == NULL) {
+                            map* m = new map();
+
+                            generate_start(TERRAIN_BORDER, m, seeds, &h);
+                            generate_roads(m,&w,m->g);
+                            generate_builds(m, man_dis);
+
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            generate_names(m);
+                            w.m[current_x][current_y] = m;
+                            
+                        }
+                        cur_map = w.m[current_x][current_y];
+                        c->y += 19;
+                        cur_map->characters[c->y][c->x] = c;
+
+                    }
                     if(move_cost(c->type, cur_map->t[c->y - 1][c->x].type) != INT_MAX) {
                         if(cur_map->characters[c->y - 1][c->x] != NULL && !cur_map->characters[c->y - 1][c->x]->isDefeated) {
                             battle_trainer(cur_map->characters[c->y - 1][c->x]);
@@ -200,6 +239,29 @@ int main(int argc, char *argv[]) {
                     tookTurn = 1;
                     break;
                     case 'l': case '6':
+                    if(cur_map->t[c->y][c->x + 1].type == TERRAIN_GATE && current_x < 400) {
+                        current_x += 1;
+                        cur_map->characters[c->y][c->x] = NULL;
+                        man_dis = (abs(current_x - 200) + abs(current_y - 200));
+                        w.current_y = current_y;
+                        w.current_x = current_x;
+                        if(w.m[current_x][current_y] == NULL) {
+                            map* m = new map();
+
+                            generate_start(TERRAIN_BORDER, m, seeds, &h);
+                            generate_roads(m,&w,m->g);
+                            generate_builds(m, man_dis);
+
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            generate_names(m);
+                            w.m[current_x][current_y] = m;
+                            
+                        }
+                        cur_map = w.m[current_x][current_y];
+                        c->x = 1;
+                        cur_map->characters[c->y][c->x] = c;
+
+                    }
                     if(move_cost(c->type, cur_map->t[c->y][c->x + 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y][c->x + 1] != NULL && !cur_map->characters[c->y][c->x + 1]->isDefeated) {
                             battle_trainer(cur_map->characters[c->y][c->x + 1]);
@@ -235,6 +297,29 @@ int main(int argc, char *argv[]) {
                     tookTurn = 1;
                     break;
                     case 'j': case '2':
+                    if(cur_map->t[c->y + 1][c->x].type == TERRAIN_GATE && current_y > 0) {
+                        current_y -= 1;
+                        cur_map->characters[c->y][c->x] = NULL;
+                        man_dis = (abs(current_x - 200) + abs(current_y - 200));
+                        w.current_y = current_y;
+                        w.current_x = current_x;
+                        if(w.m[current_x][current_y] == NULL) {
+                            map* m = new map();
+
+                            generate_start(TERRAIN_BORDER, m, seeds, &h);
+                            generate_roads(m,&w,m->g);
+                            generate_builds(m, man_dis);
+
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            generate_names(m);
+                            w.m[current_x][current_y] = m;
+                            
+                        }
+                        cur_map = w.m[current_x][current_y];
+                        c->y -= 19;
+                        cur_map->characters[c->y][c->x] = c;
+
+                    }
                     if(move_cost(c->type, cur_map->t[c->y + 1][c->x].type) != INT_MAX) {
                         if(cur_map->characters[c->y + 1][c->x] != NULL && !cur_map->characters[c->y + 1][c->x]->isDefeated) {
                             battle_trainer(cur_map->characters[c->y + 1][c->x]);
@@ -270,6 +355,28 @@ int main(int argc, char *argv[]) {
                     tookTurn = 1;
                     break;
                     case 'h': case '4':
+                    if(cur_map->t[c->y][c->x - 1].type == TERRAIN_GATE && current_x > 0) {
+                        current_x -= 1;
+                        cur_map->characters[c->y][c->x] = NULL;
+                        man_dis = (abs(current_x - 200) + abs(current_y - 200));
+                        w.current_y = current_y;
+                        w.current_x = current_x;
+                        if(w.m[current_x][current_y] == NULL) {
+                            map* m = new map();
+
+                            generate_start(TERRAIN_BORDER, m, seeds, &h);
+                            generate_roads(m,&w,m->g);
+                            generate_builds(m, man_dis);
+
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            generate_names(m);
+                            w.m[current_x][current_y] = m;
+                            
+                        }
+                        cur_map = w.m[current_x][current_y];
+                        c->x = 78;
+                        cur_map->characters[c->y][c->x] = c;
+                    }
                     if(move_cost(c->type, cur_map->t[c->y][c->x - 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y][c->x - 1] != NULL && !cur_map->characters[c->y][c->x - 1]->isDefeated) {
                             battle_trainer(cur_map->characters[c->y][c->x - 1]);
@@ -359,10 +466,78 @@ int main(int argc, char *argv[]) {
                     mvhline(0, 0, ' ', 80);
                     mvhline(22, 0, ' ', 80);
                     mvhline(23, 0, ' ', 80);
-                    mvprintw(0, 0, "A wild foobar appears!");
+                    if(debug == 0) {
+                        mvprintw(0, 0, plainMessage);
+                    } else {
+                        mvprintw(0, 0, debugMessage);
+                    }
                     mvprintw(22, 0, " ");
                     mvprintw(23, 0, "Use y/k/u/l/n/j/b/h to move. Press 'Q' to quit.");
                     refresh();
+                    break;
+                    }
+                    case 'P': {
+                        if(debug) {
+                            mvprintw(22, 0, "ZA WARUDO!");
+                            for(int i = 0; i < 21; i++) {
+                                for(int j = 0; j < 80; j++) {
+                                    if(cur_map->characters[i][j] != NULL) {
+                                        cur_map->characters[i][j]->isDefeated = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                    case 'f': {
+                        int fly_x = 0;
+                        int fly_y = 0;
+                        mvhline(0,0, ' ', 80);
+                        mvprintw(0,0, "enter X and Y coordinates to fly: ");
+                        echo();
+                        curs_set(1);
+                        char input_buf[80];
+                        getnstr(input_buf, 79);
+                        int parsed = sscanf(input_buf, "%d %d", &fly_x, &fly_y);
+                        if(parsed == 2) {
+                            mvprintw(22,0,"x: %d Y:  %d", fly_x, fly_y);
+                        }
+                        noecho();
+                        curs_set(0);
+                        if(parsed == 2 && fly_x >= -200 && fly_x <= 200 && fly_y >= -200 && fly_y <= 200) {
+                            current_x = fly_x + 200;
+                            current_y = fly_y + 200;
+                            cur_map->characters[c->y][c->x] = NULL;
+                            man_dis = (abs(current_x - 200) + abs(current_y - 200));
+                            w.current_y = current_y;
+                            w.current_x = current_x;
+                            if(w.m[current_x][current_y] == NULL) {
+                                map* m = new map();
+
+                                generate_start(TERRAIN_BORDER, m, seeds, &h);
+                                generate_roads(m,&w,m->g);
+                                generate_builds(m, man_dis);
+
+                                place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                                generate_names(m);
+                                w.m[current_x][current_y] = m; 
+                            }
+                                cur_map = w.m[current_x][current_y];
+                                int placed = 0;
+                            while (!placed) {
+                                int rx = rand() % 78 + 1;
+                                int ry = rand() % 19 + 1;
+                                if (cur_map->t[ry][rx].type == TERRAIN_ROAD && cur_map->t[ry][rx].type != TERRAIN_GATE && cur_map->characters[ry][rx] == NULL) {
+                                        c->x = rx;
+                                        c->y = ry;
+                                        placed = 1;
+                                    }
+                                }
+                                cur_map->characters[c->y][c->x] = c;
+                                tookTurn = 1;
+                        } else {
+                            mvprintw(22,0,"coords out of bounds.");
+                        }
                     break;
                     }
                     default:
@@ -371,11 +546,32 @@ int main(int argc, char *argv[]) {
             }
 
             if(runGame) {
-                move_npc(c, cur_map);
-                dijkstra_path(cur_map, HIKER);
-                dijkstra_path(cur_map, RIVAL);
-
-                heap_insert(&npc, c);
+                if (old_map != cur_map) {
+                    while (heap_remove_min(&npc)); // Clear the heap to remove old map NPCs
+                    int pc_in_map = 0;
+                    for (int i = 0; i < 21; i++) {
+                        for (int j = 0; j < 80; j++) {
+                            if (cur_map->characters[i][j]) {
+                                if (cur_map->characters[i][j] != c) {
+                                    // Sync NPC time to PC time so they don't take hundreds of consecutive turns
+                                    cur_map->characters[i][j]->next_turn = c->next_turn;
+                                }
+                                heap_insert(&npc, cur_map->characters[i][j]);
+                                if (cur_map->characters[i][j] == c) {
+                                    pc_in_map = 1;
+                                }
+                            }
+                        }
+                    }
+                    if (!pc_in_map) heap_insert(&npc, c); // Backup in case the PC wasn't perfectly placed in the arrays yet
+                    dijkstra_path(cur_map, HIKER);
+                    dijkstra_path(cur_map, RIVAL);
+                } else {
+                    move_npc(c, cur_map);
+                    dijkstra_path(cur_map, HIKER);
+                    dijkstra_path(cur_map, RIVAL);
+                    heap_insert(&npc, c);
+                }
             }
         } else {
             character *battled = move_npc(c, cur_map);
@@ -385,7 +581,11 @@ int main(int argc, char *argv[]) {
                 mvhline(0, 0, ' ', 80);
                 mvhline(22, 0, ' ', 80);
                 mvhline(23, 0, ' ', 80);
-                mvprintw(0, 0, "A wild foobar appears!");
+                if(debug == 0) {
+                    mvprintw(0, 0, plainMessage);
+                } else {
+                    mvprintw(0, 0, debugMessage);
+                }
                 mvprintw(22, 0, " ");
                 mvprintw(23, 0, "Use y/k/u/l/n/j/b/h to move. Press 'Q' to quit.");
                 refresh();
@@ -393,7 +593,9 @@ int main(int argc, char *argv[]) {
             heap_insert(&npc, c);
         }
     }
-    delwin(trainerPad);
+    if(trainerPad) {
+        delwin(trainerPad);
+    }
     endwin();
 
     for(int i = 0; i < 401; i++) {

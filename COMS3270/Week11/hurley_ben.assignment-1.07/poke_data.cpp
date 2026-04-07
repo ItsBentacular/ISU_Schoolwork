@@ -83,14 +83,16 @@ std::string loadPokeData(std::ifstream &file, std::string choice)
         }
         std::stringstream buffer;
         buffer << file.rdbuf();
-        std::cout << buffer.str() << "NEXT FILE" << std::endl;
+        std::cout << buffer.str() << std::endl;
         file.close();
     }
     return "SUCCESS";
 }
-
+/*
 int main(int argc, char *argv[])
 {
     std::ifstream file;
+    for
     std::cout << loadPokeData(file, argv[1]) << std::endl;
 }
+*/

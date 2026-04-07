@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "heap.h"
 #include "poke_logic.hpp"
+#include "poke_data.hpp"
 #include <string.h>
 #include <ncurses.h>
 #include <limits.h>
@@ -42,19 +43,6 @@ int initialize_world(world *w) {
     return 0;
 }
 
-std::string loadPokeData() {
-    const std:string& filename = "pokemon.csv";
-    const std::string& path = "C:/ISU/pokedex/pokedex/data/csv" + filename;
-    //C:\ISU\pokedex\pokedex\data\csv
-    // /share/cs327/pokedex/data/csv
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << path << std::endl;
-        return "";
-    }
-    printf(file);
-}
-
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
@@ -66,6 +54,8 @@ int main(int argc, char *argv[]) {
 
     int runGame = 1;
     int debug = 0;
+
+    std::ifstream file;
 
 
     terrain seeds[7] = {TERRAIN_WATER, TERRAIN_CLEAR, TERRAIN_CLEAR, TERRAIN_GRASS, TERRAIN_GRASS, TERRAIN_ROCK, TERRAIN_TREES};
@@ -101,7 +91,11 @@ int main(int argc, char *argv[]) {
             }
             if(strcmp(argv[i], "--debug") == 0) {
             debug = 1;
-            } 
+            } else {
+                // assignment 1.07 case is here, if no other start params, check for file name.
+                loadPokeData(file, argv[i]);
+                return 0;
+            }
         }
         if(argc < 2 || debug) {
             place_npc(m,(rand() % (10 - 2) + 2), &npc);

@@ -56,6 +56,10 @@ public:
         type = type1;
         dir_x = dir_x1;
         dir_y = dir_y1;
+        sequence_num = sequence_num1;
+        next_turn = next_turn1;
+        isDefeated = 0;
+        charName = NULL;
     } 
 
     ~character() {}
@@ -85,23 +89,28 @@ public:
 class gate {
 public:
     int gate_pos;
+
+    int is_gate(int pos) {
+        if(pos == gate_pos) {
+            return 1;
+        }
+        else { return 0; }
+    }
 };
 
 class map {
 public:
     // gate g[4] goes in order of north, south, east, west
     gate g[4];
-    
     tile t[21][80];
-    int hiker_dist[21][80];
-    int rival_dist[21][80];
-    character* characters[21][80];
 
-    map() {
+    int hiker_dist[21][80] = {};
+    int rival_dist[21][80]= {};
+    character* characters[21][80]= {};
 
-    }
+    map() = default;
 
-    ~map() {}
+    ~map() = default;
 
 };
 
@@ -111,14 +120,15 @@ public:
         int current_x;
         int current_y;
     world() {
-
+        current_x = 200;
+        current_y = 200;
     }
     ~world() {}
 };
 
 int generate_start(terrain t_type, map *m, terrain seeds[7], heap_t *h);
 
-int generate_roads(map *m, world w, gate g[4]);
+int generate_roads(map *m, world *w, gate g[4]);
 
 int generate_builds(map *m, int roll);
 

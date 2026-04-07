@@ -107,7 +107,7 @@ int generate_start(terrain border, map *m, terrain seeds[7], heap_t *h){
     return 0;
 }
 
-int generate_roads(map *m, world w, gate g[4]) {
+int generate_roads(map *m, world *w, gate g[4]) {
     // finds a random point NOT in the corners for the gates, then draws lines out of # to a certain x or y coord, then draws another line between the ends of the two lines
     // addendum: now also checks if we are in world bounds, then if there is already a map generated in a spot, make the opposite road connect to the new maps road,
     // ex: north connects to new maps south, west connects to east, else generate random roads.
@@ -115,26 +115,26 @@ int generate_roads(map *m, world w, gate g[4]) {
     // gate g[4] goes in order of north, south, east, west
 
     //north map
-    if(w.current_y < 400 && w.m[w.current_x][w.current_y + 1] != NULL) {
-        n_gate = w.m[w.current_x][w.current_y + 1]->g[1].gate_pos;
+    if(w->current_y < 400 && w->m[w->current_x][w->current_y + 1] != NULL) {
+        n_gate = w->m[w->current_x][w->current_y + 1]->g[1].gate_pos;
     } else {
         n_gate = rand() % (COLUMN -2) + 1;
     }
     //south map
-    if(w.current_y > 0 && w.m[w.current_x][w.current_y - 1] != NULL) {
-        s_gate = w.m[w.current_x][w.current_y - 1]->g[0].gate_pos;
+    if(w->current_y > 0 && w->m[w->current_x][w->current_y - 1] != NULL) {
+        s_gate = w->m[w->current_x][w->current_y - 1]->g[0].gate_pos;
     } else {
         s_gate = rand() % (COLUMN -2) + 1;
     }
     //east map
-    if(w.current_x < 400 && w.m[w.current_x + 1][w.current_y] != NULL) {
-        e_gate = w.m[w.current_x + 1][w.current_y]->g[3].gate_pos;
+    if(w->current_x < 400 && w->m[w->current_x + 1][w->current_y] != NULL) {
+        e_gate = w->m[w->current_x + 1][w->current_y]->g[3].gate_pos;
     } else {
         e_gate = rand() % (ROW - 2) + 1;
     }
     //west map
-    if(w.current_x > 0 && w.m[w.current_x - 1][w.current_y] != NULL) {
-        w_gate = w.m[w.current_x - 1][w.current_y]->g[2].gate_pos;
+    if(w->current_x > 0 && w->m[w->current_x - 1][w->current_y] != NULL) {
+        w_gate = w->m[w->current_x - 1][w->current_y]->g[2].gate_pos;
     } else {
         w_gate = rand() % (ROW - 2) + 1;
     }
@@ -143,10 +143,10 @@ int generate_roads(map *m, world w, gate g[4]) {
     int road_x = (rand() % 40) + 20;
 
     // generates the east and west roads.
-    for(int i = (w.current_x == 0) ? 1 : 0; i <= road_x; i++) {
+    for(int i = (w->current_x == 0) ? 1 : 0; i <= road_x; i++) {
         m->t[w_gate][i].type = TERRAIN_ROAD;
     }
-    for(int i = (w.current_x == 400) ? COLUMN - 2 : COLUMN - 1; i >= road_x; i--) {
+    for(int i = (w->current_x == 400) ? COLUMN - 2 : COLUMN - 1; i >= road_x; i--) {
         m->t[e_gate][i].type = TERRAIN_ROAD;
     }
 
@@ -164,10 +164,10 @@ int generate_roads(map *m, world w, gate g[4]) {
     }
 
     // generates the north and south roads.
-    for(int i = (w.current_y == 400) ? 1 : 0; i <= road_y; i++) {
+    for(int i = (w->current_y == 400) ? 1 : 0; i <= road_y; i++) {
         m->t[i][n_gate].type = TERRAIN_ROAD;
     }
-    for(int i = (w.current_y == 0) ? ROW - 2 : ROW - 1; i >= road_y; i--) {
+    for(int i = (w->current_y == 0) ? ROW - 2 : ROW - 1; i >= road_y; i--) {
         m->t[i][s_gate].type = TERRAIN_ROAD;
     }
 
@@ -189,10 +189,10 @@ int generate_roads(map *m, world w, gate g[4]) {
     g[2].gate_pos = e_gate;
     g[3].gate_pos = w_gate;
 
-    if (w.current_y < 400) m->t[0][n_gate].type = TERRAIN_GATE;
-    if (w.current_y > 0) m->t[ROW - 1][s_gate].type = TERRAIN_GATE;
-    if (w.current_x < 400) m->t[e_gate][COLUMN - 1].type = TERRAIN_GATE;
-    if (w.current_x > 0) m->t[w_gate][0].type = TERRAIN_GATE;
+    if (w->current_y < 400) m->t[0][n_gate].type = TERRAIN_GATE;
+    if (w->current_y > 0) m->t[ROW - 1][s_gate].type = TERRAIN_GATE;
+    if (w->current_x < 400) m->t[e_gate][COLUMN - 1].type = TERRAIN_GATE;
+    if (w->current_x > 0) m->t[w_gate][0].type = TERRAIN_GATE;
 
     return 0;
 }
