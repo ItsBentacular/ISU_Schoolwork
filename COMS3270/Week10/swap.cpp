@@ -11,7 +11,7 @@ void swap(int &a, int &b) {
     tmp = a;
     a = b;
     b = tmp;
-    //for each variable type you would need a swap function, but templates save the day
+    //for each variable type you would need a swap function, but templates save the day...
 }
 
 template <class T>
@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     c.i = 2;
 
     swapTemplate(b,c);
+
     cout << "b = " << b.i << ", c = " << c.i << endl;
     return 0;
 }

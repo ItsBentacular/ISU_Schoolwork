@@ -51,9 +51,13 @@ public:
 
 int main(int argc, char *argv[]) {
     // automatic/static instance: A a; vs. dynamic instance: A *a = new A;
-    D obj;
+    // D obj;
     // you can also specifically use the scope resolution to specify which class you want to use rather than cast. ((B) obj).print is cast vs. obj.B::print is scope.
     //((B) obj).A::print(); is the only way to reach A through D without being ambigous in C++
-    obj.A::print();
+    //obj.A::print();
+    A *ap;
+    ap = new D;
+    delete ap;
+
     return 0;
 }
