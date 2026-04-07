@@ -33,6 +33,7 @@ struct moves {
     int effect_id;
     int effect_chance;
     int contest_type_id;
+    int contest_effect_id;
     int super_contest_effect_id;
 };
 
