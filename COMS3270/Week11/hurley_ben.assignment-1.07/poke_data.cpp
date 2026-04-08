@@ -7,11 +7,10 @@
 #include <vector>
 #include <climits>
 
-// For demonstration, we'll use global vectors. In a real application,
-// you might want to pass vectors by reference or return them from
-// dedicated loading functions.
 std::vector<pokemon> all_pokemon;
 std::vector<moves> all_moves;
+std::vector<pokemonMoves> all_pokeMoves;
+std::vector<pokemonSpecies> all_pokeSpecies;
 // std::vector<moves> all_moves;
 // ... and so on for other data types
 
@@ -199,38 +198,75 @@ std::string loadPokeData(std::ifstream &file, std::string choice)
 
             //target_id
             std::getline(ss,field, ',');
-            m.target_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.target_id = field.empty() ? INT_MAX : std::stoi(field);
 
             //damage_class_id
             std::getline(ss,field, ',');
-            m.damage_class_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.damage_class_id = field.empty() ? INT_MAX : std::stoi(field);
     
             //effect_id
             std::getline(ss,field, ',');
-            m.effect_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.effect_id = field.empty() ? INT_MAX : std::stoi(field);
 
             //effect_chance
             std::getline(ss,field, ',');
-            m.effect_chance = field.empty() ? INT_MAX : std:: stoi(field);
+            m.effect_chance = field.empty() ? INT_MAX : std::stoi(field);
 
             //contest_type_id
             std::getline(ss,field, ',');
-            m.contest_type_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.contest_type_id = field.empty() ? INT_MAX : std::stoi(field);
 
             //contest_effect_id
             std::getline(ss,field, ',');
-            m.contest_effect_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.contest_effect_id = field.empty() ? INT_MAX : std::stoi(field);
 
             //super_contest_effect_id
             std::getline(ss,field, ',');
-            m.super_contest_effect_id = field.empty() ? INT_MAX : std:: stoi(field);
+            m.super_contest_effect_id = field.empty() ? INT_MAX : std::stoi(field);
 
             all_moves.push_back(m);
         }
     }
+    // pokemon_moves
     if (fileChoice == 2)
     {
+    std::string line;
+        while (std::getline(file, line))
+        {
+            if (!line.empty() && line.back() == '\r') {
+                line.pop_back();
+            }
+
+            std::stringstream ss(line);
+            std::string field;
+            pokemonMoves pm;
+
+            //pokemon_id
+            std::getline(ss, field,',');
+            pm.pokemon_id = field.empty() ? INT_MAX : std::stoi(field);
+
+            //version_group_id
+            std::getlines(ss, field, ',');
+            pm.version_group_id = field.empty() ? INT_MAX : std::atoi(field);
+            
+            //move_id
+            std::getlines(ss, field,',');
+            pm.move_id = field.empty() ? INT_MAX : std::atoi(field);
+
+            //pokemon_move_method_id
+            std::getlines(ss, field,',');
+            pm.pokemon_move_method_id = field.empty() ? INT_MAX : std::atoi(field);
+
+            //level
+            std::getlines(ss,field,',');
+            pm.level = field.empty() ? INT_MAX : std::atoi(field);
+
+            //order
+            std::getlines(ss,field,',');
+            pm.order = field.empty() ? INT_MAX : std::atoi(field);
+        }
     }
+    //Pokemon Species
     if (fileChoice == 3)
     {
         std::string line;
@@ -242,42 +278,84 @@ std::string loadPokeData(std::ifstream &file, std::string choice)
 
             std::stringstream ss(line);
             std::string field;
-            pokemon p;
+            pokemonSpecies ps;
 
             // id
             std::getline(ss, field, ',');
-            p.id = field.empty() ? -1 : std::stoi(field);
+            ps.id = field.empty() ? INT_MAX : std::stoi(field);
 
-            // name (identifier)
+            // identifier
             std::getline(ss, field, ',');
-            p.name = field;
+            ps.identifier = field;
 
-            // species_id
+            // generation_id
             std::getline(ss, field, ',');
-            p.species_id = field.empty() ? -1 : std::stoi(field);
+            ps.generation_id = field.empty() ? INT_MAX : std::stoi(field);
 
-            // height
+            // evolves_from_species_id
             std::getline(ss, field, ',');
-            p.height = field.empty() ? -1 : std::stoi(field);
+            ps.evolves_from_species_id = field.empty() ? INT_MAX : std::stoi(field);
 
-            // weight
+            // evolution_chain_id
             std::getline(ss, field, ',');
-            p.weight = field.empty() ? -1 : std::stoi(field);
+            ps.evolution_chain_id = field.empty() ? INT_MAX : std::stoi(field);
 
-            // base_experience
+            // color_id
             std::getline(ss, field, ',');
-            p.base_experience = field.empty() ? -1 : std::stoi(field);
+            ps.color_id = field.empty() ? INT_MAX : std::stoi(field);
+
+            // shape_id
+            std::getline(ss, field, ',');
+            ps.shape_id = field.empty() ? INT_MAX : std::stoi(field);
+
+            // habitat_id
+            std::getline(ss, field, ',');
+            ps.habitat_id = field.empty() ? INT_MAX : std::stoi(field);
+
+            // gender_rate
+            std::getline(ss, field, ',');
+            ps.gender_rate = field.empty() ? INT_MAX : std::stoi(field);
+
+            // capture_rate
+            std::getline(ss, field, ',');
+            ps.capture_rate = field.empty() ? INT_MAX : std::stoi(field);
+
+            // base_happiness
+            std::getline(ss, field, ',');
+            ps.base_happiness = field.empty() ? INT_MAX : std::stoi(field);   
+                 
+            // is_baby
+            std::getline(ss, field, ',');
+            ps.is_baby = (field == "1");
+
+            // hatch_counter
+            std::getline(ss, field, ',');
+            ps.hatch_counter = field.empty() ? INT_MAX : std::stoi(field);
+
+            // has_gender_differences
+            std::getline(ss, field, ',');
+            ps.has_gender_differences = (field == "1");
+
+            // growth_rate_id
+            std::getline(ss, field, ',');
+            ps.growth_rate_id = field.empty() ? INT_MAX : std::stoi(field);
+
+            // forms_switchable
+            std::getline(ss, field, ',');
+            ps.forms_switchable = (field == "1");
 
             // order
             std::getline(ss, field, ',');
-            p.order = field.empty() ? -1 : std::stoi(field);
+            ps.order = field.empty() ? INT_MAX : std::stoi(field);
 
-            // is_default
+            // conquest_order
             std::getline(ss, field, ',');
-            p.is_default = (field == "1");
+            ps.conquest_order = field.empty() ? INT_MAX : std::stoi(field);
 
-            all_pokemon.push_back(p);
-        }
+            // Note: You would typically have a vector for species like:
+            // all_species.push_back(ps);
+        
+
     }
     if (fileChoice == 4)
     {

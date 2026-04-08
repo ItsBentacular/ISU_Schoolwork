@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import item from "./data/fashion.json";
+import items from "./data/fashion.json";
 
 const Shop = () => {
     const [cart, setCart] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
 
-    const listItems = item.map((el) => (
+    const listItems = items.map((el) => (
         <div key={el.id}>
-            <img class="img-fluid" src={el.image} width={150} /> <br />
+            <img className="img-fluid" src={el.image} width={150} /> <br />
 
             {el.title} <br />
             {el.category} <br />
@@ -30,8 +30,8 @@ const Shop = () => {
 
     const cartItem = cart.map((el) =>(
         <div key={el.id}>
-        <img className="img-fluid" src={el.image} width={150}/>
-            {el.title}: 
+        <img className="img-fluid" src={el.image} width={250}/>
+            {el.title}
             ${el.price}
         </div>
     ));
@@ -53,10 +53,10 @@ const Shop = () => {
 
     return (
         <div>
-            <div>{listItems} </div>
-            <h1>Items in Cart : </h1>
-            <div>{cartItem} </div>
-            <h1>Order total to pay : ${cartTotal}</h1>
+            {listItems}
+            <h1>Items in Cart :</h1>
+            <div>{cartItem}</div>
+            <h1>Order total to pay :${cartTotal}</h1>
         </div>
     );
 }

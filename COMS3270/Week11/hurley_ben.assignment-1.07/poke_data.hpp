@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector>
 
+template <class P>
 struct pokemon {
     int id;
     std::string name;

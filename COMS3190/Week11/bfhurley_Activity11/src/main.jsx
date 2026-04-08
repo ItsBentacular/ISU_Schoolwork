@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Shop from './Shopping.jsx'
+import "bootstrap/dist/css/bootstrap.css";
+import Shops from "./shoppingBootstrap.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Shop />
+    <Shops />
   </React.StrictMode>
 );
