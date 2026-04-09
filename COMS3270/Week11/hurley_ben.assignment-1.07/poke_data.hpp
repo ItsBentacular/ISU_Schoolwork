@@ -8,7 +8,6 @@
 #include <sstream>
 #include <vector>
 
-template <class P>
 struct pokemon {
     int id;
     std::string name;
@@ -105,6 +104,27 @@ struct pokemonTypes {
     int slot;
 };
 
+extern std::vector<pokemon> all_pokemon;
+extern std::vector<moves> all_moves;
+extern std::vector<pokemonMoves> all_pokeMoves;
+extern std::vector<pokemonSpecies> all_pokeSpecies;
+extern std::vector<experience> all_experience;
+extern std::vector<typeNames> all_typeNames;
+extern std::vector<pokemonStats> all_pokemonStats;
+extern std::vector<stats> all_stats;
+extern std::vector<pokemonTypes> all_pokemonTypes;
+
+bool open_poke_file(std::ifstream &file, const std::string& filename);
 std::string loadPokeData(std::ifstream &file, std::string choice);
+void load_pokemon(std::ifstream &file, std::vector<pokemon> *vec);
+void load_moves(std::ifstream &file, std::vector<moves> *vec);
+void load_pokemon_moves(std::ifstream &file, std::vector<pokemonMoves> *vec);
+void load_pokemon_species(std::ifstream &file, std::vector<pokemonSpecies> *vec);
+void load_experience(std::ifstream &file, std::vector<experience> *vec);
+void load_type_names(std::ifstream &file, std::vector<typeNames> *vec);
+void load_pokemon_stats(std::ifstream &file, std::vector<pokemonStats> *vec);
+void load_stats(std::ifstream &file, std::vector<stats> *vec);
+void load_pokemon_types(std::ifstream &file, std::vector<pokemonTypes> *vec);
+void printPokeData(const std::string& choice);
 
 #endif

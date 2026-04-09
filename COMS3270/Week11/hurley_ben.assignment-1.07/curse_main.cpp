@@ -15,6 +15,15 @@
 
 
 world w;
+std::vector<pokemon> all_pokemon;
+std::vector<moves> all_moves;
+std::vector<pokemonMoves> all_pokeMoves;
+std::vector<pokemonSpecies> all_pokeSpecies;
+std::vector<experience> all_experience;
+std::vector<typeNames> all_typeNames;
+std::vector<pokemonStats> all_pokemonStats;
+std::vector<stats> all_stats;
+std::vector<pokemonTypes> all_pokemonTypes;
 
 void battle_trainer(character *npc) {
     if (npc->isDefeated) {
@@ -93,7 +102,10 @@ int main(int argc, char *argv[]) {
             debug = 1;
             } else {
                 // assignment 1.07 case is here, if no other start params, check for file name.
-                loadPokeData(file, argv[i]);
+                if (open_poke_file(file, argv[i])) {
+                    loadPokeData(file, argv[i]);
+                    printPokeData(argv[i]);
+                }
                 return 0;
             }
         }
