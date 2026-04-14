@@ -3,6 +3,7 @@
 #include <time.h>
 #include "heap.h"
 #include "poke_logic.hpp"
+#include "poke_data.hpp"
 #include <limits.h>
 #include <ncurses.h>
 #include <string.h>
@@ -828,4 +829,96 @@ void dijkstra_path(map *m, character_type type) {
         free(u);
     }
     heap_delete(&h);
+}
+
+PokemonInstance* generate_pokemon(int manhattan_distance) {
+    PokemonInstance* p = new PokemonInstance();
+
+    // --- LEVEL CALCULATION ---
+    int min_level, max_level;
+    if (manhattan_distance <= 200) {
+        min_level = 1;
+        max_level = manhattan_distance / 2;
+        if (max_level == 0) max_level = 1;
+    } else {
+        min_level = (manhattan_distance - 200) / 2;
+        if (min_level == 0) min_level = 1;
+        max_level = 100;
+    }
+    int level = min_level + (rand() % (max_level - min_level + 1));
+    
+    // --- SPECIES SELECTION ---
+    int pokemon_idx = rand() % all_pokemon.size();
+    const pokemon* base_species = &all_pokemon[pokemon_idx];
+    
+    // --- MOVESET SELECTION & LEVEL CORRECTION ---
+    std::vector<const pokemonMoves*> valid_moves;
+    bool found_moves = false;
+    
+    while (!found_moves) {
+        for (const auto& pm : all_pokeMoves) {
+            if (pm.pokemon_id == base_species->species_id && 
+                pm.pokemon_move_method_id == 1 && 
+                pm.level <= level) {
+                valid_moves.push_back(&pm);
+            }
+        }
+        if (valid_moves.empty()) {
+            level++;
+        } else {
+            found_moves = true;
+        }
+    }
+    
+    p->level = level;
+    p->base_species = base_species;
+
+    if (!valid_moves.empty()) {
+        int m1_idx = rand() % valid_moves.size();
+        int move_id_1 = valid_moves[m1_idx]->move_id;
+        for (const auto& m : all_moves) {
+            if (m.id == move_id_1) {
+                p->known_moves.push_back(&m);
+                break;
+            }
+        }
+
+        if (valid_moves.size() > 1) {
+            int attempts = 0;
+            int m2_idx = rand() % valid_moves.size();
+            // Try to find a distinct second move
+            while (valid_moves[m2_idx]->move_id == move_id_1 && attempts < 20) {
+                m2_idx = rand() % valid_moves.size();
+                attempts++;
+            }
+            
+            if (valid_moves[m2_idx]->move_id != move_id_1) {
+                int move_id_2 = valid_moves[m2_idx]->move_id;
+                for (const auto& m : all_moves) {
+                    if (m.id == move_id_2) {
+                        p->known_moves.push_back(&m);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    int base_stats[6] = {0, 0, 0, 0, 0, 0};
+    for (const auto& ps : all_pokemonStats) {
+        if (ps.pokemon_id == base_species->id && ps.stat_id >= 1 && ps.stat_id <= 6) {
+            base_stats[ps.stat_id - 1] = ps.base_stat;
+        }
+    }
+    
+    for (int i = 0; i < 6; i++) {
+        p->ivs[i] = rand() % 16;
+        p->stats[i] = (((base_stats[i] + p->ivs[i]) * 2) * p->level) / 100 + (i == 0 ? p->level + 10 : 5);
+    }
+    p->current_hp = p->stats[0];
+    
+    p->gender = rand() % 2;
+    p->is_shiny = ((rand() % 8192) == 0);
+    
+    return p;
 }

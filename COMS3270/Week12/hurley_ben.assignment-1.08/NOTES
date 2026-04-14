@@ -1,0 +1,38 @@
+Step 1: Define a "Live" Pokémon Object
+
+Where: poke_logic.hpp
+What to do: Create a new class or struct (e.g., PokemonInstance) to represent an active, instantiated Pokémon. This is different from the parsed base data.
+Details: It needs fields to store a reference to the base species data (from all_pokemon), its generated level, an array of 6 IVs, an array of 6 calculated stats (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), current HP, a list of known moves (pointers or IDs), a gender indicator, and a boolean for shininess.
+Update Characters: Update your existing character class to include a collection (like a vector or fixed array of size 6) of your new PokemonInstance objects, plus an integer to track how many Pokémon they currently hold.
+Step 2: Implement the Pokémon Generation Logic
+
+Where: poke_logic.cpp
+What to do: Create a helper function that takes the current map's Manhattan distance and returns a generated PokemonInstance.
+Details:
+Level Calculation: Calculate the minimum and maximum level using the formulas provided in the prompt. Pick a random level within that range.
+Species Selection: Pick a random species uniformly from your parsed database.
+Moveset Selection: Filter your parsed pokemon_moves data for the chosen species where the learn method is 1 (level-up). Filter again to only include moves learned at or below the generated level.
+Level Correction: If the filtered moves list is empty, increment the Pokémon's level and check again until at least one move is available. Once you have a valid list, randomly pick up to two moves.
+IVs and Stats: Generate six random numbers between 0 and 15 for IVs. Retrieve the base stats for the species from pokemon_stats and calculate the actual stats using the provided formulas.
+Gender and Shiny: Roll a 50/50 chance for gender, and a 1/8192 chance for the Pokémon to be shiny.
+Step 3: Assign Pokémon to NPCs
+
+Where: poke_logic.cpp (specifically inside place_npc)
+What to do: Give every generated NPC a valid Pokémon party based on the map's distance.
+Details: When you spawn a Hiker, Rival, Pacer, etc., call your new generation function to give them exactly one Pokémon. Then, create a while loop that rolls a 60% chance to give them another one. Continue this loop until the 60% roll fails or the NPC hits the maximum of 6 Pokémon. Do not do this for the PC character.
+Step 4: Create the Starter Selection Interface
+
+Where: curse_main.cpp
+What to do: Create an interface for the player to choose their first Pokémon before the main game loop begins.
+Details: Right after map generation and placing the PC but before entering the while(runGame) loop, generate three random Pokémon forced to level 1. Create a new ncurses window that displays the names, stats, and moves of these three Pokémon. Prompt the user to press a key (like 1, 2, or 3) to choose one, and add the selected Pokémon to the PC's party.
+Step 5: Implement Tall Grass Encounters
+
+Where: curse_main.cpp
+What to do: Add a chance for wild encounters when the PC moves onto grass tiles.
+Details: Inside your switch statement for PC movement inputs, after you successfully update the PC's coordinates, check if the tile they just stepped on is TERRAIN_GRASS. If it is, roll a 10% chance. If it hits, trigger a wild_encounter() function.
+Wild Encounter UI: Create a function that generates a single Pokémon using the current map's Manhattan distance. Open a ncurses window over the map, display "A wild [Name] appeared!", and print its level, stats, gender, shininess, and moves. Pause and wait for the user to press a key (like ESC) to dismiss the window and resume the game.
+Step 6: Update the Trainer Battle Interface
+
+Where: curse_main.cpp (specifically inside battle_trainer)
+What to do: Expand your existing placeholder battle window.
+Details: Instead of just printing "Battle with !", iterate through the NPC's party of Pokémon. Print out the details of every Pokémon they hold (Name, Level, Stats, Moves). This satisfies the requirement to prove to the TAs that your NPC Pokémon generation rules are working properly.

@@ -1,6 +1,7 @@
 #ifndef POKE_H
 #define POKE_H
 #include "heap.h"
+#include <vector>
 
 enum terrain {
     TERRAIN_BORDER = 127,
@@ -27,6 +28,29 @@ enum character_type {
         EXPLORER = 'e'
 };
 
+struct pokemon;
+struct moves;
+
+class PokemonInstance {
+public:
+    const pokemon* base_species;
+    int level;
+    int ivs[6];           // [0]=HP, [1]=Atk, [2]=Def, [3]=Sp.Atk, [4]=Sp.Def, [5]=Speed
+    int stats[6];         // [0]=HP, [1]=Atk, [2]=Def, [3]=Sp.Atk, [4]=Sp.Def, [5]=Speed
+    int current_hp;
+    std::vector<const moves*> known_moves;
+    int gender;           // 0 for male, 1 for female
+    bool is_shiny;
+
+    PokemonInstance() : base_species(NULL), level(1), current_hp(1), gender(0), is_shiny(false) {
+        for (int i = 0; i < 6; i++) {
+            ivs[i] = 0;
+            stats[i] = 0;
+        }
+    }
+    ~PokemonInstance() {}
+};
+
 class character {
 public:
     int x;
@@ -38,6 +62,9 @@ public:
     int dir_y;
     int isDefeated;
     char * charName; 
+    
+    PokemonInstance* pokemon_party[6];
+    int num_pokemon;
 
     character() {
         x = 0;
@@ -49,6 +76,10 @@ public:
         dir_y = 0;
         isDefeated = 0;
         charName = NULL;
+        num_pokemon = 0;
+        for (int i = 0; i < 6; i++) {
+            pokemon_party[i] = NULL;
+        }
     }
     character(int x1, int y1, character_type type1, int dir_x1, int dir_y1, int sequence_num1, int next_turn1) {
         x = x1;
@@ -60,9 +91,21 @@ public:
         next_turn = next_turn1;
         isDefeated = 0;
         charName = NULL;
+        num_pokemon = 0;
+        for (int i = 0; i < 6; i++) {
+            pokemon_party[i] = NULL;
+        }
     } 
 
-    ~character() {}
+    ~character() {
+        for (int i = 0; i < num_pokemon; i++) {
+            if (pokemon_party[i] != NULL) {
+                delete pokemon_party[i];
+                pokemon_party[i] = NULL;
+            }
+        }
+        // Note: keeping charName untouched here per original scope 
+    }
 };
 
 class tile {
@@ -147,6 +190,8 @@ void generate_names(map *m);
 void dijkstra_path(map *m, character_type type);
 
 int32_t character_cmp(const void *key, const void *with);
+
+PokemonInstance* generate_pokemon(int manhattan_distance);
 
 
 #endif
