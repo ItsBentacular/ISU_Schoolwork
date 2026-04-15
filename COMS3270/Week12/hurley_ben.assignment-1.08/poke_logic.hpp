@@ -30,6 +30,8 @@ enum character_type {
 
 struct pokemon;
 struct moves;
+struct pokemonMoves;
+struct pokemonStats;
 
 class PokemonInstance {
 public:
@@ -181,7 +183,11 @@ int move_cost(character_type c, terrain t);
 
 void place_pc(map *m, heap_t*);
 
-void place_npc(map *m, int num_trainers, heap_t *h);
+void place_npc(map *m, int num_trainers, heap_t *h, int man_dis, 
+               const std::vector<struct pokemon>& pokemon, 
+               const std::vector<pokemonMoves>& poke_moves, 
+               const std::vector<moves>& moves_list, 
+               const std::vector<pokemonStats>& poke_stats);
 
 character* move_npc(character *c, map *m);
 
@@ -191,7 +197,11 @@ void dijkstra_path(map *m, character_type type);
 
 int32_t character_cmp(const void *key, const void *with);
 
-PokemonInstance* generate_pokemon(int manhattan_distance);
+PokemonInstance* generate_pokemon(int manhattan_distance, 
+                                  const std::vector<struct pokemon>& pokemon, 
+                                  const std::vector<pokemonMoves>& poke_moves, 
+                                  const std::vector<moves>& moves_list, 
+                                  const std::vector<pokemonStats>& poke_stats);
 
 
 #endif

@@ -431,7 +431,11 @@ void place_pc(map *m, heap_t *h) {
 }
 
 // if num_trainers is set to -1, we randomize the number of trainers in a map, else follow what user sets.
-void place_npc(map *m, int num_trainers, heap_t *h) {
+void place_npc(map *m, int num_trainers, heap_t *h, int man_dis, 
+               const std::vector<struct pokemon>& pokemon, 
+               const std::vector<pokemonMoves>& poke_moves, 
+               const std::vector<moves>& moves_list, 
+               const std::vector<pokemonStats>& poke_stats) {
     int npcPlaced = 0;
     int randNPC = 0;
     static int sequence_num = 1000; // Start higher than PC to avoid collisions at turn 0
@@ -448,6 +452,8 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
         if(npcPlaced == 1) {
             randNPC = 1;
         }
+        
+        character *spawned_npc = NULL;
         switch(randNPC) {
             case 0:
             //hiker
@@ -461,6 +467,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_hiker;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_hiker;
                 }
             break;
             case 1:
@@ -475,6 +482,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_rival;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_rival;
                 }
             break;
             case 2:
@@ -489,6 +497,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_swimmer;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_swimmer;
                 }
             break;
             case 3:
@@ -503,6 +512,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_pacer;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_pacer;
                 }
             break;
             case 4:
@@ -517,6 +527,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_wanderer;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_wanderer;
                 }
             break;
             case 5:
@@ -531,6 +542,7 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_sentry;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_sentry;
                 }
             break;
             case 6:
@@ -545,9 +557,20 @@ void place_npc(map *m, int num_trainers, heap_t *h) {
                     m->characters[y][x] = new_explorer;
                     npcPlaced++;
                     heap_insert(h, m->characters[y][x]); 
+                    spawned_npc = new_explorer;
                 }
             break;
-        }  
+        }
+        
+        if (spawned_npc != NULL) {
+            spawned_npc->pokemon_party[0] = generate_pokemon(man_dis, pokemon, poke_moves, moves_list, poke_stats);
+            spawned_npc->num_pokemon = 1;
+            // number on end of while loop is chance, so change this if want chance of trainers having less pokemon to be higher.
+            while (spawned_npc->num_pokemon < 6 && (rand() % 100) < 60) {
+                spawned_npc->pokemon_party[spawned_npc->num_pokemon] = generate_pokemon(man_dis, pokemon, poke_moves, moves_list, poke_stats);
+                spawned_npc->num_pokemon++;
+            }
+        }
     }
 }
 
@@ -831,10 +854,14 @@ void dijkstra_path(map *m, character_type type) {
     heap_delete(&h);
 }
 
-PokemonInstance* generate_pokemon(int manhattan_distance) {
+PokemonInstance* generate_pokemon(int manhattan_distance, 
+                                  const std::vector<struct pokemon>& pokemon, 
+                                  const std::vector<pokemonMoves>& poke_moves, 
+                                  const std::vector<moves>& moves_list, 
+                                  const std::vector<pokemonStats>& poke_stats) {
     PokemonInstance* p = new PokemonInstance();
 
-    // --- LEVEL CALCULATION ---
+    // level calc
     int min_level, max_level;
     if (manhattan_distance <= 200) {
         min_level = 1;
@@ -847,16 +874,16 @@ PokemonInstance* generate_pokemon(int manhattan_distance) {
     }
     int level = min_level + (rand() % (max_level - min_level + 1));
     
-    // --- SPECIES SELECTION ---
-    int pokemon_idx = rand() % all_pokemon.size();
-    const pokemon* base_species = &all_pokemon[pokemon_idx];
+    // species selection
+    int pokemon_idx = rand() % pokemon.size();
+    const struct pokemon* base_species = &pokemon[pokemon_idx];
     
-    // --- MOVESET SELECTION & LEVEL CORRECTION ---
+    // moveset and level
     std::vector<const pokemonMoves*> valid_moves;
     bool found_moves = false;
     
     while (!found_moves) {
-        for (const auto& pm : all_pokeMoves) {
+        for (const auto& pm : poke_moves) {
             if (pm.pokemon_id == base_species->species_id && 
                 pm.pokemon_move_method_id == 1 && 
                 pm.level <= level) {
@@ -876,7 +903,7 @@ PokemonInstance* generate_pokemon(int manhattan_distance) {
     if (!valid_moves.empty()) {
         int m1_idx = rand() % valid_moves.size();
         int move_id_1 = valid_moves[m1_idx]->move_id;
-        for (const auto& m : all_moves) {
+        for (const auto& m : moves_list) {
             if (m.id == move_id_1) {
                 p->known_moves.push_back(&m);
                 break;
@@ -894,7 +921,7 @@ PokemonInstance* generate_pokemon(int manhattan_distance) {
             
             if (valid_moves[m2_idx]->move_id != move_id_1) {
                 int move_id_2 = valid_moves[m2_idx]->move_id;
-                for (const auto& m : all_moves) {
+                for (const auto& m : moves_list) {
                     if (m.id == move_id_2) {
                         p->known_moves.push_back(&m);
                         break;
@@ -905,7 +932,7 @@ PokemonInstance* generate_pokemon(int manhattan_distance) {
     }
     
     int base_stats[6] = {0, 0, 0, 0, 0, 0};
-    for (const auto& ps : all_pokemonStats) {
+    for (const auto& ps : poke_stats) {
         if (ps.pokemon_id == base_species->id && ps.stat_id >= 1 && ps.stat_id <= 6) {
             base_stats[ps.stat_id - 1] = ps.base_stat;
         }

@@ -25,18 +25,81 @@ std::vector<pokemonStats> all_pokemonStats;
 std::vector<stats> all_stats;
 std::vector<pokemonTypes> all_pokemonTypes;
 
-void battle_trainer(character *npc) {
+void battle_trainer(character *npc, int debug) {
     if (npc->isDefeated) {
         return; // Already defeated, don't battle again.
     }
     WINDOW *battle_win = newwin(24, 80, 0, 0);
     box(battle_win, 0, 0);
-    mvwprintw(battle_win, 10, 25, "Battle with %s!", npc->charName);
-    mvwprintw(battle_win, 12, 25, "Press ESC to exit battle.");
+    int ch;
+    
+    char line1[80];
+    char line2[80];
+    const char* line3 = "Press ESC to exit battle.";
+    
+    sprintf(line1, "Battle with %s!", npc->charName);
+    sprintf(line2, "%s has %d pokemon with %s as their starter", npc->charName, npc->num_pokemon, npc->pokemon_party[0]->base_species->name.c_str());
+    
+    // Use this to have centered text with ncurses: (window_width - string_length) / 2
+    mvwprintw(battle_win, 10, (80 - strlen(line1)) / 2, "%s", line1);
+    mvwprintw(battle_win, 11, (80 - strlen(line2)) / 2, "%s", line2);
+    mvwprintw(battle_win, 12, (80 - strlen(line3)) / 2, "%s", line3);
+    
+    if (debug) {
+        const char* line4 = "Debug: Press ENTER to view starter stats";
+        mvwprintw(battle_win, 14, (80 - strlen(line4)) / 2, "%s", line4);
+    }
+
     wrefresh(battle_win);
     
-    int ch;
+    int viewing_stats = 0;
+    int current_pokemon = 0;
+    int needs_redraw = 0;
+
     while((ch = getch()) != 27) {
+        if(debug && !viewing_stats && (ch == 10 || ch == '\n' || ch == KEY_ENTER)) {
+            viewing_stats = 1;
+            current_pokemon = 0;
+            needs_redraw = 1;
+        } else if (viewing_stats) {
+            if (ch == KEY_UP && current_pokemon > 0) {
+                current_pokemon--;
+                needs_redraw = 1;
+            } else if (ch == KEY_DOWN && current_pokemon < npc->num_pokemon - 1) {
+                current_pokemon++;
+                needs_redraw = 1;
+            }
+        }
+        
+        if (needs_redraw) {
+            werase(battle_win);
+            box(battle_win, 0, 0);
+            
+            PokemonInstance* p = npc->pokemon_party[current_pokemon];
+            mvwprintw(battle_win, 2, 4, "Pokemon %d of %d: %s (Level %d)", current_pokemon + 1, npc->num_pokemon, p->base_species->name.c_str(), p->level);
+            mvwprintw(battle_win, 4, 4, "HP:      %3d / %3d", p->current_hp, p->stats[0]);
+            mvwprintw(battle_win, 5, 4, "Attack:  %3d", p->stats[1]);
+            mvwprintw(battle_win, 6, 4, "Defense: %3d", p->stats[2]);
+            mvwprintw(battle_win, 7, 4, "Sp. Atk: %3d", p->stats[3]);
+            mvwprintw(battle_win, 8, 4, "Sp. Def: %3d", p->stats[4]);
+            mvwprintw(battle_win, 9, 4, "Speed:   %3d", p->stats[5]);
+            
+            mvwprintw(battle_win, 11, 4, "IVs: HP:%d Atk:%d Def:%d SpA:%d SpD:%d Spe:%d", 
+                      p->ivs[0], p->ivs[1], p->ivs[2], p->ivs[3], p->ivs[4], p->ivs[5]);
+            mvwprintw(battle_win, 13, 4, "Gender: %s", p->gender == 0 ? "Male" : "Female");
+            mvwprintw(battle_win, 14, 4, "Shiny:  %s", p->is_shiny ? "Yes" : "No");
+            
+            mvwprintw(battle_win, 16, 4, "Known Moves:");
+            for (size_t i = 0; i < p->known_moves.size(); i++) {
+                mvwprintw(battle_win, 17 + i, 6, "- %s", p->known_moves[i]->name.c_str());
+            }
+
+            const char* line5 = "Use UP / DOWN arrows to scroll party";
+            mvwprintw(battle_win, 20, (80 - strlen(line5)) / 2, "%s", line5);
+            mvwprintw(battle_win, 21, (80 - strlen(line3)) / 2, "%s", line3);
+            wrefresh(battle_win);
+            needs_redraw = 0;
+        }
     }
     npc->isDefeated = 1;
     delwin(battle_win);
@@ -55,6 +118,22 @@ int initialize_world(world *w) {
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
+
+    // Load all database files needed for the game to function
+    const char* db_files[] = {
+        "pokemon", "moves", "pokemon_moves", "pokemon_species",
+        "experience", "type_names", "pokemon_stats", "stats", "pokemon_types"
+    };
+    for (int i = 0; i < 9; i++) {
+        std::ifstream f;
+        if (open_poke_file(f, db_files[i])) {
+            loadPokeData(f, db_files[i]);
+        }
+    }
+    if (all_pokemon.empty()) {
+        std::cerr << "Error: Pokemon database failed to load. Please ensure the CSV files are present." << std::endl;
+        return 1;
+    }
 
     initialize_world(&w);
 
@@ -91,26 +170,22 @@ int main(int argc, char *argv[]) {
         for(int i = 1; i < argc; i++) {
             if(strcmp(argv[i], "--numtrainers") == 0) {
                 if(i + 1 < argc) {
-                    place_npc(m, atoi(argv[i + 1]), &npc);
+                    place_npc(m, atoi(argv[i + 1]), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                     i++;   
                 } else {
                     printf("--numtrainers requires a integer value after.\n");
                     return -1;
                 }
-            }
-            if(strcmp(argv[i], "--debug") == 0) {
+        } else if(strcmp(argv[i], "--debug") == 0) {
             debug = 1;
-            } else {
-                // assignment 1.07 case is here, if no other start params, check for file name.
-                if (open_poke_file(file, argv[i])) {
-                    loadPokeData(file, argv[i]);
-                    printPokeData(argv[i]);
-                }
+        } else {
+            // assignment 1.07 case is here, if it is a database file name print it and exit
+            printPokeData(argv[i]);
                 return 0;
             }
         }
         if(argc < 2 || debug) {
-            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+            place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
         }
         generate_names(m);
 
@@ -149,6 +224,52 @@ int main(int argc, char *argv[]) {
 
     const char *plainMessage = "A wild foobar has appeared!";
     const char *debugMessage = "Debug Mode Active.";
+
+        int choiceMade = 0;
+        character *new_char = new character(0,0,SENTRY,0,0,0,0);
+        for(int i = 0; i < 3; i++) {
+            new_char->pokemon_party[i] = generate_pokemon(man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
+        }
+        
+        refresh(); // Draw standard screen background so the choice menu doesn't black-screen
+        PokemonInstance *player_poke = new PokemonInstance();
+        while(!choiceMade) {
+            WINDOW *choice_win = newwin(24, 80, 0, 0);
+            box(choice_win, 0, 0);
+        
+            char line1[80];
+            char line2[80];
+            char line3[80];
+            const char* line4 = "Choose your starter with 1, 2, or 3";
+            char line5[80];
+            
+            sprintf(line1, "Welcome to the world of POKEMON!");
+            sprintf(line2, "before I let you go, I need you to pick your first pokemon:");
+            sprintf(line3, "1: %s, 2: %s, 3: %s", new_char->pokemon_party[0]->base_species->name.c_str(), new_char->pokemon_party[1]->base_species->name.c_str(),new_char->pokemon_party[2]->base_species->name.c_str());
+            
+            mvwprintw(choice_win, 9, (80 - strlen(line1)) / 2, "%s", line1);
+            mvwprintw(choice_win, 10, (80 - strlen(line2)) / 2, "%s", line2);
+            mvwprintw(choice_win, 11, (80 - strlen(line3)) / 2, "%s", line3);
+            mvwprintw(choice_win, 12, (80 - strlen(line4)) / 2, "%s", line4);
+
+            wrefresh(choice_win);
+            int ch = getch();
+            if(ch == '1' || ch == '2' || ch == '3') {
+                player_poke = new_char->pokemon_party[ch - '1'];
+                choiceMade = 1;
+                sprintf(line5, "You chose: %s", player_poke->base_species->name.c_str());
+                mvwprintw(choice_win, 13, (80 - strlen(line5)) / 2, "%s", line5);
+                wrefresh(choice_win);
+                usleep(1500000); // Wait 1.5 seconds so you can see the text
+            }
+            delwin(choice_win); // Prevent memory leaks if loop repeats
+        }
+        
+        clear(); // Wipe the menu off the screen completely
+        refresh();
+        delete new_char;
+
+
     while(runGame) {
         character *c = (character *)heap_remove_min(&npc);
         if (c == NULL) {
@@ -186,7 +307,7 @@ int main(int argc, char *argv[]) {
                     case 'y': case '7':
                     if(move_cost(c->type, cur_map->t[c->y - 1][c->x - 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y - 1][c->x - 1] != NULL && !cur_map->characters[c->y - 1][c->x - 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y - 1][c->x - 1]);
+                            battle_trainer(cur_map->characters[c->y - 1][c->x - 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y - 1][c->x - 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -215,7 +336,7 @@ int main(int argc, char *argv[]) {
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
 
-                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
                             w.m[current_x][current_y] = m;
                             
@@ -227,7 +348,7 @@ int main(int argc, char *argv[]) {
                     }
                     if(move_cost(c->type, cur_map->t[c->y - 1][c->x].type) != INT_MAX) {
                         if(cur_map->characters[c->y - 1][c->x] != NULL && !cur_map->characters[c->y - 1][c->x]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y - 1][c->x]);
+                            battle_trainer(cur_map->characters[c->y - 1][c->x], debug);
                         } else {
                             character *swap = cur_map->characters[c->y - 1][c->x];
                             cur_map->characters[c->y][c->x] = swap;
@@ -245,7 +366,7 @@ int main(int argc, char *argv[]) {
                     case 'u': case '9':
                     if(move_cost(c->type, cur_map->t[c->y - 1][c->x + 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y - 1][c->x + 1] != NULL && !cur_map->characters[c->y - 1][c->x + 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y - 1][c->x + 1]);
+                            battle_trainer(cur_map->characters[c->y - 1][c->x + 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y - 1][c->x + 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -274,7 +395,7 @@ int main(int argc, char *argv[]) {
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
 
-                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
                             w.m[current_x][current_y] = m;
                             
@@ -286,7 +407,7 @@ int main(int argc, char *argv[]) {
                     }
                     if(move_cost(c->type, cur_map->t[c->y][c->x + 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y][c->x + 1] != NULL && !cur_map->characters[c->y][c->x + 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y][c->x + 1]);
+                            battle_trainer(cur_map->characters[c->y][c->x + 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y][c->x + 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -303,7 +424,7 @@ int main(int argc, char *argv[]) {
                     case 'n': case '3':
                     if(move_cost(c->type, cur_map->t[c->y + 1][c->x + 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y + 1][c->x + 1] != NULL && !cur_map->characters[c->y + 1][c->x + 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y + 1][c->x + 1]);
+                            battle_trainer(cur_map->characters[c->y + 1][c->x + 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y + 1][c->x + 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -332,7 +453,7 @@ int main(int argc, char *argv[]) {
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
 
-                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
                             w.m[current_x][current_y] = m;
                             
@@ -344,7 +465,7 @@ int main(int argc, char *argv[]) {
                     }
                     if(move_cost(c->type, cur_map->t[c->y + 1][c->x].type) != INT_MAX) {
                         if(cur_map->characters[c->y + 1][c->x] != NULL && !cur_map->characters[c->y + 1][c->x]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y + 1][c->x]);
+                            battle_trainer(cur_map->characters[c->y + 1][c->x], debug);
                         } else {
                             character *swap = cur_map->characters[c->y + 1][c->x];
                             cur_map->characters[c->y][c->x] = swap;
@@ -361,7 +482,7 @@ int main(int argc, char *argv[]) {
                     case 'b': case '1':
                     if(move_cost(c->type, cur_map->t[c->y + 1][c->x - 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y + 1][c->x - 1] != NULL && !cur_map->characters[c->y + 1][c->x - 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y + 1][c->x - 1]);
+                            battle_trainer(cur_map->characters[c->y + 1][c->x - 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y + 1][c->x - 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -390,7 +511,7 @@ int main(int argc, char *argv[]) {
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
 
-                            place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                            place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
                             w.m[current_x][current_y] = m;
                             
@@ -401,7 +522,7 @@ int main(int argc, char *argv[]) {
                     }
                     if(move_cost(c->type, cur_map->t[c->y][c->x - 1].type) != INT_MAX) {
                         if(cur_map->characters[c->y][c->x - 1] != NULL && !cur_map->characters[c->y][c->x - 1]->isDefeated) {
-                            battle_trainer(cur_map->characters[c->y][c->x - 1]);
+                            battle_trainer(cur_map->characters[c->y][c->x - 1], debug);
                         } else {
                             character *swap = cur_map->characters[c->y][c->x - 1];
                             cur_map->characters[c->y][c->x] = swap;
@@ -540,7 +661,7 @@ int main(int argc, char *argv[]) {
                                 generate_roads(m,&w,m->g);
                                 generate_builds(m, man_dis);
 
-                                place_npc(m,(rand() % (10 - 2) + 2), &npc);
+                                place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                                 generate_names(m);
                                 w.m[current_x][current_y] = m; 
                             }
@@ -598,7 +719,7 @@ int main(int argc, char *argv[]) {
         } else {
             character *battled = move_npc(c, cur_map);
             if (battled) {
-                battle_trainer(battled);
+                battle_trainer(battled, debug);
                 map_print(cur_map);
                 mvhline(0, 0, ' ', 80);
                 mvhline(22, 0, ' ', 80);
