@@ -106,6 +106,48 @@ void battle_trainer(character *npc, int debug) {
     clear();
 }
 
+void wild_encounter(int man_dis) {
+    PokemonInstance* p = generate_pokemon(man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
+    
+    WINDOW *enc_win = newwin(24, 80, 0, 0);
+    box(enc_win, 0, 0);
+    
+    char line1[80];
+    const char* line2 = "Press ESC to run away.";
+    
+    sprintf(line1, "A wild %s appeared! (Level %d)", p->base_species->name.c_str(), p->level);
+    
+    mvwprintw(enc_win, 2, 4, "%s", line1);
+    mvwprintw(enc_win, 4, 4, "HP:      %3d / %3d", p->current_hp, p->stats[0]);
+    mvwprintw(enc_win, 5, 4, "Attack:  %3d", p->stats[1]);
+    mvwprintw(enc_win, 6, 4, "Defense: %3d", p->stats[2]);
+    mvwprintw(enc_win, 7, 4, "Sp. Atk: %3d", p->stats[3]);
+    mvwprintw(enc_win, 8, 4, "Sp. Def: %3d", p->stats[4]);
+    mvwprintw(enc_win, 9, 4, "Speed:   %3d", p->stats[5]);
+    
+    mvwprintw(enc_win, 11, 4, "IVs: HP:%d Atk:%d Def:%d SpA:%d SpD:%d Spe:%d", 
+              p->ivs[0], p->ivs[1], p->ivs[2], p->ivs[3], p->ivs[4], p->ivs[5]);
+    mvwprintw(enc_win, 13, 4, "Gender: %s", p->gender == 0 ? "Male" : "Female");
+    mvwprintw(enc_win, 14, 4, "Shiny:  %s", p->is_shiny ? "Yes" : "No");
+    
+    mvwprintw(enc_win, 16, 4, "Known Moves:");
+    for (size_t i = 0; i < p->known_moves.size(); i++) {
+        mvwprintw(enc_win, 17 + i, 6, "- %s", p->known_moves[i]->name.c_str());
+    }
+
+    mvwprintw(enc_win, 21, (80 - strlen(line2)) / 2, "%s", line2);
+    wrefresh(enc_win);
+    
+    int ch;
+    while((ch = getch()) != 27) {
+        // wait for ESC
+    }
+    
+    delwin(enc_win);
+    clear();
+    delete p;
+}
+
 int initialize_world(world *w) {
     for(int i = 0; i < 401; i++) {
         for(int j = 0; j < 401; j++) {
@@ -298,6 +340,8 @@ int main(int argc, char *argv[]) {
             int tookTurn = 0;
 
             while(!tookTurn && runGame) {
+                int old_x = c->x;
+                int old_y = c->y;
                 int input = getch();
 
                 switch(input) {
@@ -685,6 +729,14 @@ int main(int argc, char *argv[]) {
                     }
                     default:
                     break;
+                }
+
+                if (tookTurn && (c->x != old_x || c->y != old_y)) {
+                    if (cur_map->t[c->y][c->x].type == TERRAIN_GRASS) {
+                        if ((rand() % 100) < 10) {
+                            wild_encounter(man_dis);
+                        }
+                    }
                 }
             }
 
