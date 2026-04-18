@@ -1,0 +1,5 @@
+04-12-26, 11:00 AM: started updating structs and classes to allow trainers to hold pokemon, created a pokemon instance class. started working on generate_pokemon function
+
+04-13-26, 6:00 PM: Finished generate_pokemon to allow pokemon to be generated for trainers and created a stat view menu to allow the data to be seen for pokemon(use --debug).
+
+04-14-26, 5:00 PM: created wild_encouter to allow pokemon to be encountered in tall grass, fixed a few bugs and created the choose your pokemon menu at the start of the game.

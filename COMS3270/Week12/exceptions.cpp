@@ -15,7 +15,7 @@ private:
     const char *s;
 public:
     exception3270(const char *s) : s(s) {}
-    const char  *what() {
+    const char  *what() const throw() {
         return s;
     }
 
@@ -26,7 +26,7 @@ class alsoborked {
 public:
     void bar() {
         // you can technically throw any type you want in c++, even your own classes!
-        throw "foo failed";
+        throw exception3270(s) : "foo failed";
     }
 };
 

@@ -1,0 +1,19 @@
+{
+  "name": "mongo_db",
+  "version": "1.0.0",
+  "description": "First mongoDB NodeServer",
+  "license": "ISC",
+  "author": "bfhurley",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.1",
+    "nodemon": "^3.1.14"
+  }
+}

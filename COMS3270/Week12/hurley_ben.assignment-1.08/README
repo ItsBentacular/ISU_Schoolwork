@@ -1,1 +1,3 @@
 to access all pokemon details, run with --debug(ex: ./assignment01 --debug), that will allow you to press enter in the battle window and view detailed stats.
+The datasets are loaded into the main file to allow for pokemon data to be read. I have implemented most of the required features; When starting the game, the user is prompted to select from 3 pokemon, and while walking through tall grass, pokemon will appear (with scaled levels)
+trainers do spawn with pokemon and have all the required data/stats (Which can be viewed with the --debug runtime command!!) Moves are implemented and should be attached correctly to a pokemon.
