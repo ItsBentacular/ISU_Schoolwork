@@ -1,0 +1,1 @@
+to access all pokemon details, run with --debug(ex: ./assignment01 --debug), that will allow you to press enter in the battle window and view detailed stats.
