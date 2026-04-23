@@ -43,8 +43,10 @@ public:
     std::vector<const moves*> known_moves;
     int gender;           // 0 for male, 1 for female
     bool is_shiny;
+    int current_xp;
+    int growth_rate_id;
 
-    PokemonInstance() : base_species(NULL), level(1), current_hp(1), gender(0), is_shiny(false) {
+    PokemonInstance() : base_species(NULL), level(1), current_hp(1), gender(0), is_shiny(false), current_xp(0), growth_rate_id(1) {
         for (int i = 0; i < 6; i++) {
             ivs[i] = 0;
             stats[i] = 0;

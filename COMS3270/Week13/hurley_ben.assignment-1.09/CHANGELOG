@@ -1,0 +1,7 @@
+04-19-26: Implemented structure for the ncurses battle menu, fixed a few bugs regarding ncurses display
+
+04-20-26: implemented STAB, Critical, and other attack functions, implemented run feature, added details to display in battle menu.
+
+04-21-26: implemented fighting mechanics, added ability to catch pokemon, added items and refill at pokemarts/healing at pokecenters.
+
+04-22-26: fixed bug where catching a pokemon and then using it next battle would cause a crash, fixed bug where catching more than 6 pokemon would cause game to crash, fixed other small bugs

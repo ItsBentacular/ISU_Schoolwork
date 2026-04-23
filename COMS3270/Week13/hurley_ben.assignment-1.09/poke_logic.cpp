@@ -901,6 +901,23 @@ PokemonInstance* generate_pokemon(int manhattan_distance,
     p->level = level;
     p->base_species = base_species;
 
+    // Get the growth rate so we know which XP curve to use
+    p->growth_rate_id = 1; // Default fallback
+    for (const auto& ps : all_pokeSpecies) {
+        if (ps.id == base_species->species_id) {
+            p->growth_rate_id = ps.growth_rate_id;
+            break;
+        }
+    }
+    
+    // Give the Pokemon the base experience appropriate for its current level
+    for (const auto& exp : all_experience) {
+        if (exp.growth_rate_id == p->growth_rate_id && exp.level == p->level) {
+            p->current_xp = exp.experience;
+            break;
+        }
+    }
+
     if (!valid_moves.empty()) {
         int m1_idx = rand() % valid_moves.size();
         int move_id_1 = valid_moves[m1_idx]->move_id;

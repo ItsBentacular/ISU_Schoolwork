@@ -1,1 +1,3 @@
-to access all pokemon details, run with --debug(ex: ./assignment01 --debug), that will allow you to press enter in the battle window and view detailed stats.
+All work is implemented for assignment1.09, pokemon battles are implemented and allow for fightingcatching, and running from both wild and trainer pokemon battles. trainer battles allow you to 
+fight but not run or catch the pokemon, while pokemon battles allow all of the above. battles have item selection with potions, pokeballs and revives. STAB is implemted as well as critical,
+Leveling, and escaping. Pokecenters will heal all pokemon and Pokemarts will refill. AI for NPCs randomly choose between swapping, healing, and fighting.

@@ -1,0 +1,46 @@
+1. Data Structures & State (poke_logic.hpp)
+You already have a fantastic start here with the PokemonInstance and character classes.
+
+Inventory: In your character class, add integers to track the counts for potions, revives, and pokeballs. Set them to default starting values (e.g., 5 of each) in your character constructors.
+Active Pokémon: Add an integer variable to your character class (e.g., active_pokemon_index) to track which of the 6 party members is currently battling.
+HP Tracking: You already have current_hp and stats[0] (which acts as Max HP) in your PokemonInstance class, which is perfect. You will modify current_hp during battles.
+2. The Battle UI and Loop (curse_main.cpp)
+You already have placeholder functions battle_trainer and wild_encounter! This is where the core battle loop will live.
+
+The Interface: Instead of just displaying the stats and waiting for ESC, update the ncurses window inside these functions to show a battle menu at the bottom with options for Fight, Bag, Run, and Pokemon.
+The Turn Loop: Replace your while((ch = getch()) != 27) loop with the actual turn-based logic loop.
+Wait for the PC to select a menu option.
+If the player chooses Fight, prompt them to pick one of the moves from the active PokemonInstance's known_moves vector.
+Generate the NPC's action (e.g., automatically pick "Fight" and choose a random move from their active Pokémon).
+3. Executing Actions (Logic in poke_logic.cpp or inline in curse_main.cpp)
+Once the inputs are gathered in the loop, execute the turn order.
+
+Speed/Priority: Compare the priority of the chosen moves (you can get this from the moves struct pointer in known_moves). If priority ties, compare stats[5] (Speed) of both active PokemonInstances.
+Damage Calculation: Create a helper function in poke_logic.cpp (e.g., calculate_damage()) that takes the attacking PokemonInstance, the defending PokemonInstance, and the chosen move.
+Pull the Power, Accuracy, and Type from the move.
+For the STAB (Same Type Attack Bonus) multiplier, look up the attacker's pokemon_id in your global all_pokemonTypes vector (from poke_data.cpp) to see if the move's type_id matches the Pokémon's type.
+Apply the professor's damage formula using the attacker's stats[1] (Attack) and defender's stats[2] (Defense), roll for critical hit based on the attacker's base speed, and return the final damage integer.
+Using Items: If the player picked Bag, decrement the appropriate inventory integer in the character object. If it's a Potion, add 20 to current_hp (capping at stats[0]). If it's a Revive, set a fainted Pokemon's current_hp to stats[0] / 2.
+Fainting: At the end of every attack/action, check if either active Pokémon's current_hp is <= 0. If so, force that character to switch to the next valid Pokémon in their pokemon_party array. If an NPC has no conscious Pokémon left, set npc->isDefeated = 1 and break the loop.
+4. Catching Pokémon (curse_main.cpp)
+Inside wild_encounter, if the player uses a Pokéball from the Bag menu:
+
+Check the player character's num_pokemon variable.
+If it is less than 6, add the wild PokemonInstance to pokemon_party[num_pokemon], increment num_pokemon, and immediately end the battle (break the loop).
+If it is 6, print a message that the Pokémon escaped, and decrement the Pokéball count.
+5. Overworld Integration (curse_main.cpp)
+You need to connect the world mechanics in your main() input switch statement:
+
+PokeCenters: Look at your case '>': (around line 437). If curse_map->t[c->y][c->x].type == TERRAIN_POKEC, write a small for loop that iterates through the PC's pokemon_party array (up to num_pokemon) and resets current_hp = stats[0].
+PokeMarts: In that exact same case '>', if the terrain is TERRAIN_POKEM, reset the PC's inventory variables back to their starting limits (e.g., 5).
+The Bag Menu ('B'): Inside the switch(input) block for PC movement, add case 'B':. Create a new temporary ncurses window (like you did for the trainerPad) that lists the PC's pokemon_party array and allows them to consume Potions or Revives to heal outside of battle, updating current_hp accordingly.
+
+formula for damage:
+
+(((((2 * Level / 5) + 2) * Power * Attack/Defense) / 50) + 2) * Critical * random * STAB * Type
+
+Escape Formula = floor(SpeedTrainer * 32/ floor(SpeedWild/4) mod256) + 30 * Attempts
+SpeedTrainer = level-adjusted speed to the trainers' active pokemon
+SpeedWild = level-adjusted speed to the wild pokemon
+Attempts = num of attempts in this battle to escaped
+this is out of 256, if rand() mod 256 < Escape Formula, the trainer escapes
