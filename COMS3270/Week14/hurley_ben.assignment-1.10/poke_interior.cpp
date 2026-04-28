@@ -8,7 +8,7 @@
 #define COLUMN 80
 #define ROW 21
 
-int generate_caves(map *m, int chance)
+int generate_caves(map *m, int chance, cave *c)
 {
     int space_x, space_y;
     int cave_placed = 0;

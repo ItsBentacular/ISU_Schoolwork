@@ -642,24 +642,21 @@ int main(int argc, char *argv[]) {
     w.current_x = current_x;
     w.current_y = current_y;
 
+    interior *pc = new interior();
+    interior *pm = new interior();
+    cave *gen_cave = new cave();
+
     if(w.m[current_x][current_y] == NULL) {
         map * m = new map();
-
-        for(int i = 0; i < 80; i++) {
-            for(int j = 0; j < 21; j++) {
-                if(m->t[j][i].type == TERRAIN_POKEC) {
-                    interior *pc = new interior();
-                }
-            }
-        }
 
         heap_init(&npc, character_cmp, NULL);
 
         generate_start(TERRAIN_BORDER, m, seeds, &h);
         generate_roads(m,&w,m->g);
         generate_builds(m, man_dis);
-        generate_caves(m, 90);
+        generate_caves(m, 90, gen_cave);
         place_pc(m, &npc);
+
         for(int i = 1; i < argc; i++) {
             if(strcmp(argv[i], "--numtrainers") == 0) {
                 if(i + 1 < argc) {
@@ -851,7 +848,7 @@ int main(int argc, char *argv[]) {
                             generate_start(TERRAIN_BORDER, m, seeds, &h);
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
-                            generate_caves(m, 20);
+                            generate_caves(m, 20, gen_cave);
 
                             place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
@@ -911,7 +908,7 @@ int main(int argc, char *argv[]) {
                             generate_start(TERRAIN_BORDER, m, seeds, &h);
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
-                            generate_caves(m, 20);
+                            generate_caves(m, 20, gen_cave);
 
                             place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
@@ -970,7 +967,7 @@ int main(int argc, char *argv[]) {
                             generate_start(TERRAIN_BORDER, m, seeds, &h);
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
-                            generate_caves(m, 20);
+                            generate_caves(m, 20, gen_cave);
 
                             place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
@@ -1029,7 +1026,7 @@ int main(int argc, char *argv[]) {
                             generate_start(TERRAIN_BORDER, m, seeds, &h);
                             generate_roads(m,&w,m->g);
                             generate_builds(m, man_dis);
-                            generate_caves(m, 20);
+                            generate_caves(m, 20, gen_cave);
 
                             place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                             generate_names(m);
@@ -1061,11 +1058,13 @@ int main(int argc, char *argv[]) {
                         mvhline(0, 0, ' ', 80);
                         if(cur_map->t[c->y][c->x].type == TERRAIN_POKEC) {
                             mvprintw(0, 0, "Welcome to the PokeCenter! We've healed all of your pokemon! |Press < to leave.|");
+                            enter_pokecenter_interior(cur_map, pc);
                             heal_pokemon(c);
 
                         }
                         if(cur_map->t[c->y][c->x].type == TERRAIN_POKEM) {
                             mvprintw(0, 0, "Welcome to the PokeMart! We've refilled all of your items  |Press < to leave.|");
+                            enter_pokemart_interior(cur_map, pm);
                             refill_items(c);
                         }
                         if(cur_map->t[c->y][c->x].type == TERRAIN_CAVE) {
@@ -1186,7 +1185,7 @@ int main(int argc, char *argv[]) {
                                 generate_start(TERRAIN_BORDER, m, seeds, &h);
                                 generate_roads(m,&w,m->g);
                                 generate_builds(m, man_dis);
-                                generate_caves(m, 20);
+                                generate_caves(m, 2, gen_cave);
 
                                 place_npc(m,(rand() % (10 - 2) + 2), &npc, man_dis, all_pokemon, all_pokeMoves, all_moves, all_pokemonStats);
                                 generate_names(m);
