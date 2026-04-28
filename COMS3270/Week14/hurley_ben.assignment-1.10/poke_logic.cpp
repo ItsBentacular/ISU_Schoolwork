@@ -219,10 +219,10 @@ int generate_builds(map *m, int man_dis) {
         if(m->t[space_y][space_x].type == TERRAIN_ROAD && space_y > 3 && space_y < ROW - 3 && space_x > 3 && space_x < COLUMN - 3) {
                 if (m->t[space_y-1][space_x].type != TERRAIN_ROAD && m->t[space_y-2][space_x].type != TERRAIN_ROAD && m->t[space_y-1][space_x+1].type != TERRAIN_ROAD && m->t[space_y-2][space_x+1].type != TERRAIN_ROAD) {
 
-                    m->t[space_y-1][space_x].type   = (terrain)'C';
-                    m->t[space_y-2][space_x].type   = (terrain)'C';
-                    m->t[space_y-1][space_x+1].type = (terrain)'C';
-                    m->t[space_y-2][space_x+1].type = (terrain)'C';
+                    m->t[space_y-1][space_x].type   = TERRAIN_POKEC;
+                    m->t[space_y-2][space_x].type   = TERRAIN_POKEC;
+                    m->t[space_y-1][space_x+1].type = TERRAIN_POKEC;
+                    m->t[space_y-2][space_x+1].type = TERRAIN_POKEC;
                     building_placed = 1;
             }
         }
@@ -242,10 +242,10 @@ int generate_builds(map *m, int man_dis) {
                     m->t[space_y+1][space_x+1].type != TERRAIN_ROAD && m->t[space_y+1][space_x+1].type != 'C' &&
                     m->t[space_y+2][space_x+1].type != TERRAIN_ROAD && m->t[space_y+2][space_x+1].type != 'C') {
                     
-                    m->t[space_y+1][space_x].type   = (terrain)'M';
-                    m->t[space_y+2][space_x].type   = (terrain)'M';
-                    m->t[space_y+1][space_x+1].type = (terrain)'M';
-                    m->t[space_y+2][space_x+1].type = (terrain)'M';
+                    m->t[space_y+1][space_x].type   = TERRAIN_POKEM;
+                    m->t[space_y+2][space_x].type   = TERRAIN_POKEM;
+                    m->t[space_y+1][space_x+1].type = TERRAIN_POKEM;
+                    m->t[space_y+2][space_x+1].type = TERRAIN_POKEM;
                     building_placed = 1;
                 }
             }
@@ -286,7 +286,7 @@ int map_print(map *m){
                     mvaddch(i + 1, j, m->t[i][j].type);
                     attroff(COLOR_PAIR(2));
                 }
-                if(m->t[i][j].type == TERRAIN_ROCK) {
+                if(m->t[i][j].type == TERRAIN_ROCK || m->t[i][j].type == TERRAIN_CAVE ) {
                     attron(COLOR_PAIR(4));
                     mvaddch(i + 1, j, m->t[i][j].type);
                     attroff(COLOR_PAIR(4));
@@ -335,6 +335,7 @@ int move_cost(character_type c, terrain t) {
                 case TERRAIN_TREES: return INT_MAX;
                 case TERRAIN_WATER: return INT_MAX;
                 case TERRAIN_BORDER: return INT_MAX;
+                case TERRAIN_CAVE: return 20;
                 default: return INT_MAX;
             }
         case HIKER:
@@ -411,19 +412,12 @@ void place_pc(map *m, heap_t *h) {
         int y = rand() % (ROW - 2) + 1;
 
         if (m->t[y][x].type == TERRAIN_ROAD && m->t[y][x].type != TERRAIN_GATE && m->characters[y][x] == NULL) {
-            character *player_char = new character();
+            character *player_char = new character(x,y,PC,0,0,sequence_num++,0);
             if(player_char == NULL) {
                 printf("failed to place character, reccommend restart");
                 return;
             }
             m->characters[y][x] = player_char;
-            m->characters[y][x]->type = PC;
-            m->characters[y][x]->x = x;
-            m->characters[y][x]->y = y;
-            m->characters[y][x]->next_turn = 0;
-            m->characters[y][x]->sequence_num = sequence_num++;
-            m->characters[y][x]->dir_x = 0;
-            m->characters[y][x]->dir_y = 0;
             pcPlaced = 1;
             heap_insert(h, m->characters[y][x]); 
         }

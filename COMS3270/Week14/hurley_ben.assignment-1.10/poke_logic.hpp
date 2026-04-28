@@ -14,7 +14,8 @@ enum terrain {
     TERRAIN_GATE = 125,
     TERRAIN_EMPTY = ' ',
     TERRAIN_POKEC = 'C',
-    TERRAIN_POKEM = 'M'
+    TERRAIN_POKEM = 'M',
+    TERRAIN_CAVE = 'O'
 };
 
 enum character_type {

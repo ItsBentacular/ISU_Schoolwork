@@ -1,0 +1,3 @@
+4-25-26: 5:00 PM: detailed plans for this final assignment, created interior binary files that represent the inside of a pokemart and pokecenter.
+
+4-26-26, 8:00 PM: implemented cave entrance generation, in which cave entrances (new terrain represented by O) are generated on the sides of mountains, created interior struct to represent a new type of map that is "inside" the map.
